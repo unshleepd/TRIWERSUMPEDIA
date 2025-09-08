@@ -14,11 +14,11 @@ Wejdź — a poznasz prawa rządzące naszym wszechświatem. Prawdy, które dot�
 
 ## 📖 SPIS TREŚCI
 
-- [Galeria Wybranych Artykułów](#-galeria-wybranych-artykułów)
-- [Przewodnik po Uniwersum Triwersum (Dla Nowych Czytelników)](#-przewodnik-po-uniwersum-triwersum-dla-nowych-czytelników)
-- [Pełny Katalog Artykułów](#-pełny-katalog-artykułów)
-- [Jak Przyczynić Się](#-jak-przyczynić-się)
-- [Licencja](#-licencja)
+- [Galeria Wybranych Artykułów](#galeria-wybranych-artykułów)
+- [Przewodnik po Uniwersum Triwersum](#przewodnik-po-uniwersum-triwersum-dla-nowych-czytelników)
+- [Pełny Katalog Artykułów](#pełny-katalog-artykułów)
+- [Jak Przyczynić Się](#jak-przyczynić-się)
+- [Licencja](#licencja)
 
 ---
 
