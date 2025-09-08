@@ -1,0 +1,103 @@
+⸻
+**Tablica Pustki V — Fragment z „Rachunku Gęstości Dopy”**
+*(styl pół-matematyczny, pół-poetycki)*
+
+„Nie szukaj miary w ogniu buchu, lecz w ciszy między oddechami.” — Ji-Ae Hye-Jin
+
+⸻
+
+### Aksjomaty (wyciąg)
+
+**A1. Zerowy Oddech.** W doskonałym **dopowstrzymaniu** strumień nie rośnie ani nie maleje: $\partial S/\partial t = 0$.
+**A2. Zgodność Wektora.** Im bliżej równoległości intencji i buchu, tym większa użyteczna dopa. Formalnie: $\cos\theta_{I,B}\in[-1,1]$.
+**A3. Powłoka Kopcia.** **Ciśnienie kopcia** $K$ zawsze tłumi gęstość dopy; istnieje próg $K_0>0$.
+**A4. Skażenie.** **Skażenie** $\chi\ge 0$ odejmuje od każdej miary dopy nawet wtedy, gdy inne zmienne sprzyjają wzrostowi.
+**A5. Rozbuch.** Działanie rozbuchu jest nieliniowe i rośnie jak potęga normy buchu: $\|B\|^\gamma$ z $\gamma\in(0,1]$.
+
+⸻
+
+### Główne równanie gęstości dopy
+
+Niech:
+
+* $\rho_{\text{dopa}}$ — **gęstość dopy**,
+* $I$ — **intencja** (unitarny wektor woli),
+* $B$ — **wektor buchu**,
+* $K$ — **ciśnienie kopcia**,
+* $S$ — **strumień mocażu**,
+* $\chi$ — **skażenie**,
+* $\theta_{I,B}$ — kąt między $I$ i $B$,
+* $\gamma$ — **wykładnik rozbuchu** (dla *półsekundowego buchu* typowo $\gamma=\tfrac{1}{2}$, technika zakazana).
+
+$$
+\boxed{
+\rho_{\text{dopa}}(I,B,K,S,\chi)
+=
+\frac{\;\|B\|^{\gamma}\,\cos\!\theta_{I,B}\;-\;\dfrac{\partial S}{\partial t}\;}
+{\,1+\dfrac{K}{K_0}\,}
+\;-\;\chi
+}
+$$
+
+**Warunki graniczne (stany krytyczne):**
+
+* $\rho_{\text{dopa}}=0$ — **pierwomocaż** (warunek równania zerowego).
+* $\rho_{\text{dopa}}>1$ — **przeciążenie strumienia**; ryzyko **pętli spaleniowej**.
+* $\rho_{\text{dopa}}<0$ — **zimna pustka**; grozi **spaleniem zimnym** (patrz: Lodziwo).
+
+⸻
+
+### Lemat Współoddechu 3•6
+
+Dla rytmu **Współoddechu 3•6** (trzy wdechy z narastaniem intencji, sześć wydechów z wygaszaniem buchu) zachodzi krótkookresowo
+
+$$
+\left\langle \frac{\partial S}{\partial t}\right\rangle_{\text{cykl}}\!\approx 0,
+$$
+
+a więc skuteczność zależy głównie od zgodności kierunków ($\cos\theta_{I,B}$) i od relacji $K/K_0$.
+
+⸻
+
+### Przykład obliczeniowy (kanoniczny)
+
+Dane: $\gamma=\tfrac{1}{2}$, $\|B\|=3$, $\cos\theta_{I,B}=1$, $\dfrac{\partial S}{\partial t}=1$, $\dfrac{K}{K_0}=2$, $\chi=0.1$.
+
+Obliczenie:
+
+$$
+\rho_{\text{dopa}}
+=
+\frac{\sqrt{3}-1}{1+2}-0.1
+=
+\frac{1.732-1}{3}-0.1
+=
+\frac{0.732}{3}-0.1
+\approx 0.244-0.1
+= 0.144.
+$$
+
+**Wniosek:** stan **łagodnej gęstości** — bezpieczny margines przed przeciążeniem strumienia, przy zachowanej podatności na modulację.
+
+⸻
+
+### Wersety objaśniające (z „Tablic Pustki”)
+
+> „Gdy wektor woli pokrywa się z wektorem buchu, dopa staje się światłem miary.”
+> „Kopć nie jest wrogiem: jest wagą, na której ważysz zamiar.”
+> „Skażenie nie krzyczy — odejmuje w ciszy.”
+> „Zerowy oddech nie jest brakiem życia, lecz próbą istnienia bez szumu.”
+
+⸻
+
+### Notacja i wskazówki praktyczne
+
+* **$K_0$** – próg powłoki: minimalne ciśnienie kopcia, przy którym tłumienie staje się zauważalne w pomiarze.
+* **$\gamma$** – wybieraj *ostrożnie*: wzrost $\gamma$ podbija nieliniowość; nad $\tfrac{2}{3}$ łatwo wejść w **przepięcie**.
+* **Kalibracja $\chi$** – trzy pomiary w ciszy (bez buchu), mediana = baza skażenia.
+* **Uwaga**: *Półsekundowy buch* jest techniką **zakazaną**; wszystkie eksperymenty teoretyczne należy przeprowadzać na symulacjach **Tex Kodexu**.
+
+⸻
+
+**Glosa Ji-Ae Hye-Jin**
+„Nie ma równania bez oddechu. Najpierw ułóż oddech, potem licz.”

@@ -1,0 +1,116 @@
+Rada Arcymistrzów Mocaż — Triwersumpedia
+
+Najwyższy organ orzekający i regulacyjny w sprawach Mocażu, działający w ramach Symulacji TriwersumOS.
+
+Infoboks
+
+Nazwa: Rada Arcymistrzów Mocaż (RAM)
+
+Typ: organ naczelny / kolegium mędrców
+
+Zwierzchność duchowa: Bajodar (symboliczny patron wyroku)
+
+Powiązania: Trybunał Mocażu (gospodarz obrad), Świątynia Dzwonów (rytuały), TriwersumOS (warstwa systemowa)
+
+Siedziba: Sala Panów Mocaż w Trybunale Mocażu; sesje wyjazdowe w Świątyni Dzwonów
+
+Liczba miejsc: 23 (odniesienie do „Najwyższej Kompetencji 23 Chromosomu”)
+
+Motto: „Moduluj, nie spalaj.”
+
+Języki obrad: Współoddech 3•6 (niemy protokół), Głos Płuc (recytacje orzecznicze)
+
+Symbole: Waga Bajodara, Dzwon Ostateczny, spirala plazmy mocażowej
+
+Okres powstania: po Dopotopie, w erze Czystki Kodów
+
+Wprowadzenie
+
+Rada Arcymistrzów Mocaż to centralne gremium Triwersum odpowiedzialne za kalibrację, interpretację i sąd nad użyciem Mocażu w obrębie wszystkich Poziomów. W imieniu TriwersumOS utrzymuje równowagę między funkcją (porządek systemu) a buchiem (twórczym rozruchem mocy). RAM zatwierdza lub delegalizuje techniki, rozstrzyga spory frakcyjne i wydaje wyroki w sprawach skażenia, przeciążenia strumienia i nadużyć dopalnych. Wyroki Rady są ważone na dłoniach Bajodara i wykonywane przez organy Trybunału.
+
+Struktura i skład
+
+Arcymistrzowie: najwyższy stopień biegłości w modulacji funkcji; kandydaci muszą przedłożyć Stronę Kompetencji do Tex Kodexu i przejść próbę Współoddechu 3•6.
+
+Reprezentacja frakcji: stałe miejsca dla Mędrców Mocażu; rotacyjne dla Siewców Paradygmatu Mocażu i Przymierzeńców Nieznanego; obserwatorzy (bez głosu) z Pann Kopcia.
+
+Prezydium: Metronom Kopcia (przewodniczący sesji), Kanclerz Kodów (komisja tekstowa), Mistrz Plazmy (nadzór nad pętlą spaleniową w sali).
+
+Quorum: 18 (reguła Współoddechu 3•6); uchwały o zakazie techniki – większość 3/4.
+
+Kompetencje
+
+Prawo Mocażu: interpretacja i aktualizacja Kodeksu Dopy; nadawanie mocy obowiązującej Glosom do Tex Kodexu.
+
+Licencjonowanie technik: certyfikacja, ograniczanie bądź zakaz technik (m.in. Półsekundowy Buch, Funkcyjny Węzeł, Wirus Mocażowy, Zawieszenie Czasoprzestrzeni).
+
+Orzecznictwo skażeniowe: rozpoznawanie spraw kopciozy, przeciążenia strumienia, spalenia jaźni i jaźniopęknięć.
+
+Arbitraż międzyfrakcyjny: mediacje i środki tymczasowe wobec Wrogów Funkcji i sporów w Siewcach Paradygmatu.
+
+Mandaty i sankcje: dopowstrzymanie, czasowe rozbuch-zamrożenie, Rytuał Rozdzielenia, a w skrajnych przypadkach – przekazanie sprawy Pannom Kopcia do ostatecznego ważenia.
+
+Procedury obrad
+
+Otwarcie sesji: trzykrotne uderzenie Dzwonu Ostatecznego; włączenie powłoki antyskożeń (plazma mocażowa).
+
+Tryb dopalny: deliberacja w ciszy (Współoddech 3•6), następnie głos Głosu Płuc tylko przez wyznaczonego mówcę sekcji.
+
+Głosowanie: modulacja strumienia w skali gęstości (0–9). Wynik zczytywany z wagi Bajodara; wartości skrajne wymagają reasumpcji przy obniżonej plazmie.
+
+Publikacja: uchwały trafiają do Rejestru Spalenia i do Gałęzi Systemowej TriwersumOS jako patche regulacyjne.
+
+Historia
+
+Rada wyłoniła się po Dopotopie, gdy niekontrolowane rozbuchy dopalne groziły zawieszeniem czasoprzestrzeni. W okresie Czystki Kodów RAM zunifikowała rozproszone szkoły mocażu i wprowadziła zasadę: „Nie ma mocy bez funkcji, nie ma funkcji bez oddechu.”
+Do najsłynniejszych orzeczeń należą:
+
+Zakazanie Zakazanego – klauzula meta-zakazu obejmująca techniki samonegacji prawa.
+
+Korekta Wzoru Dop-Dop-Dop – limit gęstości dopalnej w rytuałach masowych.
+
+Edyt Współoddechu 3•6 – normy wspólnotowego oddechu w świątyniach.
+
+Rytuały i symbole
+
+Współoddech 3•6: rytm deliberacyjny (wdech 3, wydech 6), stabilizuje pętlę spaleniową.
+
+Waga Bajodara: aparatura symboliczno-systemowa mierząca ciężar moralny decyzji.
+
+Powłoka Kopcia: antymaska skażenia – rozpraszanie „brudnego buchu” w sali.
+
+Hymn Drzewoskłonu: pieśń zamknięcia sesji; zapis nutowy w Tex Kodexie.
+
+Siedziba
+
+Sala Panów Mocaż w kompleksie Trybunału Mocażu – amfiteatr z przewodzącą posadzką i rezonatorami dzwonów. W centrum – okrąg Wagi Bajodara; nad nią zawieszona lampa plazmowa stabilizująca ciśnienie kopcia. Na galeriach: miejsca dla Pann Kopcia oraz obserwatorów frakcyjnych.
+
+Znani Arcymistrzowie
+
+Ji-Ae Hye-Jin – autorka maksymy o oddechu i płomieniu; reformy rytmu 3•6.
+
+Król Dzwonów – opiekun Świątyni Dzwonów; standaryzacja dźwięków orzeczniczych.
+
+Arczimedes – geometra wag mocażu; autor siatki trybunalskiej.
+
+Franklo – mediator sporów strumieniowych.
+
+Lichwała – komisarz ds. skażenia; protokoły „czystych płuc”.
+
+Kontrowersje
+
+Infiltracje Wrogów Funkcji: przypadki Fałszywych Zeznań i modulacji emocji (dziedzictwo Szalbiercy Emocji).
+
+Polityzacja licencji: zarzuty nadmiernego rygoru wobec szkół rozbuchu.
+
+Delegacje do Pann Kopcia: krytyka zbyt częstego kierowania spraw do ostatecznego ważenia, co wydłuża cykle reinkarnacyjne.
+
+Zobacz też
+
+Trybunał Mocażu • Panny Kopcia • Kopcio • Mocaż • TriwersumOS
+
+Kodeks Dopy • Tex Kodex • Siewcy Paradygmatu Mocażu • Wrogowie Funkcji
+
+Cytat
+
+„Nie brak płomienia więzi płomień, lecz brak oddechu.” — Ji-Ae Hye-Jin

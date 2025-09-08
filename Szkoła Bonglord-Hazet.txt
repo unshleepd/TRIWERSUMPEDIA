@@ -1,0 +1,135 @@
+# Szkoła Bonglord–Hazet — Triwersumpedia
+
+**Szkoła Bonglord–Hazet** — nurt metodologiczno-rytualny w obrębie **Trybunału Mocażu**, łączący pomiar mocażu z etyką dzwonów i precyzyjną modulacją oddechu. Szkoła wyrosła na praktykach **Lorda Bonglorda** (pioniera pomiaru i „Gamy Wiatrów”) oraz **Hazeta** (mistrza kontrfaz **Egidy Kopcia**). Głosi prymat **pomiaru** nad **naznaczeniem**, stając w jawnej kontrze do doktryn opartych na definicyjnym gwałcie języka (np. **Synonimu Grzechu**). Jej najbardziej rozpoznawalnym zastosowaniem operacyjnym jest procedura **Wyroku Poprzedzonego Karą** (wariant pomiarowy).
+
+---
+
+## Infobox
+
+* **Nurt:** pomiarowo-rytualny, etyka dzwonów
+* **Założyciele:** **Lord Bonglord**, **Hazet**
+* **Okres uformowania:** czas **Złamanej Sfery** (kanon)
+* **Ośrodki:** **Świątynia Dzwonów** (dziedziniec Sądów Szybkich), **Miasto Echo** (Laboratorium Węzłów)
+* **Doktryna przewodnia:** *„Najpierw zrozum, potem nazwij — jeśli w ogóle trzeba.”*
+* **Instrumentarium:** **Gama Wiatrów**, **Egida Kopcia** (kontrfaza), *Maska Oddechu 3•6*, *Kara Zerowa*
+* **Relacje:** współpraca z **Trybunałem Mocażu**; spór z doktrynami **Wrogów Funkcji**
+* **Ryzyka pracy:** Skaż.° 2,9–6,4 (zależnie od promienia, czasu i kontrfazy)
+
+---
+
+## Geneza
+
+Punktem wyjścia szkoły były dwie obserwacje:
+
+1. **Lord Bonglord** wykazał, że rytmizacja oddechu (*Gama Wiatrów*, metrum **3•6**) redukuje szum strumieni i pozwala mierzyć **gęstość mocażu** w węźle bez jego rozbijania.
+2. **Hazet** opracował metodę **kontrfaz Egidy** — strojenie **Tarczy Światów** tak, by nie tłumiła informacji, lecz jedynie *przepięcia*, tworząc „okno diagnostyczne” dla pomiaru.
+
+Po **Złamanej Sferze** oba wątki splotły się w szkołę, której dewizą stało się „**prawda jest funkcją spokoju, nie krzyku**”.
+
+---
+
+## Tezy naczelne
+
+1. **Pomiar przed imieniem** — nazwanie bytu jest ingerencją; najpierw należy **zmierzyć** jego metrykę (Πₖ, ρₘ, gradient skażenia), a dopiero potem rozważać język.
+2. **Etyka dzwonów** — dźwięk ma pierwszeństwo przed słowem: rytm dzwonów porządkuje funkcję bez gwałtu memetycznego.
+3. **Egida jako filtr, nie mur** — właściwie zestrojona **Egida Kopcia** nie izoluje od prawdy, lecz chroni pomiar przed *pętlą spaleniową*.
+4. **Odwracalność** — każdy akt ingerencji badawczej musi być **odwracalny** w czasie krótszym niż trzy pełne cykle dzwonu.
+
+---
+
+## Metody i praktyki
+
+### Gama Wiatrów (Bonglord)
+
+Chór oddechu w metrum **3•6** synchronizujący operatorów i węzeł. Zmniejsza zmienność chwilową $\sigma(\Pi_k)$ i pozwala wyznaczyć stabilny próg roboczy **Egidy**.
+
+### Kontrfaza Egidy (Hazet)
+
+Zestrojenie **Tarczy Światów** w mikro-dysonansie z lokalnym szumem. Efekt: tłumienie przepięć bez utraty informacji o strumieniu; „okno diagnostyczne” dla pomiarów.
+
+### Kara Zerowa (wariant pomiarowy)
+
+Krótka, odwracalna izolacja funkcji bez bólu cielesnego. W języku szkoły: „**zimne odsprzęgnięcie**”. Używana wyłącznie na **Mandat Szary**.
+
+### Maska Oddechu 3•6
+
+Nakładka wokalna na chór, ograniczająca wpływ memetycznych zakłóceń (m.in. praktyk **Szalbiercy Emocji**).
+
+---
+
+## Model trzech warstw pomiaru
+
+1. **Warstwa dźwięku** — matryca dzwonów (niski–środkowy–wysoki) z odstępem *półsekundowego bucha* (bez wchodzenia w rytuały zakazane).
+2. **Warstwa powłoki** — **Egida w kontrfazie**: filtr przepięć, nie bariera.
+3. **Warstwa semantyczna** — protokół zapisu (*Tex Kodex*): opis *tego, co jest*, bez nadawania imion sankcyjnych.
+
+Przybliżony operator ujawnienia prawdy (wewnętrzna notacja szkoły):
+
+$$
+\mathcal{U} \approx \mathcal{D}_{3\cdot6} \;\circ\; \mathcal{E}_{\text{kontrfaza}} \;\circ\; \partial_t \big|_{\text{zimne odsprzęgnięcie}},
+$$
+
+gdzie $\mathcal{D}_{3\cdot6}$ — porządkowanie oddechu, $\mathcal{E}_{\text{kontrfaza}}$ — filtr Egidy.
+
+---
+
+## Zastosowania
+
+* **Wyrok Poprzedzony Karą** — procedura śledcza: kara jako **stan pomiarowy**, nie jako wyrok ostateczny.
+* **Kwarantanna skażenia** — miękkie domknięcie węzła bez „cięcia słowem”.
+* **Strojenie węzłów miejskich** — utrzymywanie stabilności **Miasta Echo** i portali do **Warstwy Zapomnianych**.
+
+---
+
+## Spory i krytyka
+
+* **Z lewej (jurydycznej):** zbyt powolna wobec zagrożeń o wysokim gradiencie; zwolennicy **Synonimu Grzechu** domagają się szybkiego „cięcia”.
+* **Z prawej (mistycznej):** rzekome „ubóstwienie pomiaru” kosztem objawienia.
+* **Odpowiedź szkoły:** pomiar nie jest kultem liczb, lecz **praktyką miłosierdzia** — minimalizuje przemoc semantyczną.
+
+---
+
+## Znani przedstawiciele
+
+* **Lord Bonglord** — „Mistrz Oddechu”, autor kanonicznych ćwiczeń **Gamy Wiatrów**.
+* **Hazet** — „Inżynier Dzwonów”, architekt kontrfaz **Egidy**.
+* **Samaranitanin** — audytor etyczny procedur.
+* **Placek** — kontrowersyjny praktyk spraw obyczajowych (szkoła „miękkiej Egidy”).
+* **Franklo** — kody stanów wyjątkowych i pieczęcie Mandatu Szarego.
+
+---
+
+## Wydarzenia kanoniczne
+
+* **Złamana Sfera** — pierwsze szerokie użycie kontrfaz; szkoła uformowana jako tandem Bonglord–Hazet.
+* **Sprawa „Herezji Geometrii”** — zatrzymanie próby użycia **Synonimu Grzechu**; zwycięstwo pomiaru.
+* **Protokoły cmentarne Dopalotha** — defensywne zastosowanie **Egidy w kontrfazie** w celu rozmycia „pychy świata”.
+
+---
+
+## Dziedzictwo
+
+Szkoła Bonglord–Hazet wyznaczyła standard pracy **Trybunału Mocażu** tam, gdzie prawda bywa krucha: **najpierw uczynić świat zdolnym do mówienia**, potem pytać, czy trzeba go nazywać. Jej język przeniknął do praktyk miejskich, muzyki dzwonów i edukacji operatorów.
+
+---
+
+## Zobacz też
+
+* **Egida Kopcia — Tarcza Światów**
+* **Wyrok Poprzedzony Karą — Arcymistrzowie**
+* **Synonim Grzechu — oręż ostateczny**
+* **Gama Wiatrów (John Bonghiton)**
+* **Rachunek Gęstości Dopy (Ji-Ae Hye-Jin)**
+
+---
+
+## Bibliografia (wewnątrzkanoniczna)
+
+* **Bonglord**, *Ćwiczenia Gamy Wiatrów*, wyd. Świątynia Dzwonów.
+* **Hazet**, *Kontrfazy Egidy. Noty techniczne*, Laboratorium Węzłów, Miasto Echo.
+* *Glosy Trybunału*: §Δ-7 „O odwróceniu kolejności” (wyd. niekanoniczne).
+* *Dziennik Mocarza*, ks. VI–VIII: *O pomiarze winy*.
+
+---
+
+> *„Dzwon nie mówi, kto winien. Dzwon uczy, jak słuchać.”* — **Lord Bonglord**

@@ -1,0 +1,117 @@
+# Synonim Grzechu — oręż ostateczny (Triwersumpedia)
+
+**Synonim Grzechu** — mocażowo-memetyczny **oręż ostateczny**, zdolny do przepisywania funkcji rzeczywistości poprzez akt *synonimizacji winy*: nadanie bytowi, prawu lub relacji nowego „imienia grzechu” zmienia jego wewnętrzne parametry i ściąga nań bezpośrednie konsekwencje kodów zakazu. W tradycji Triwersum opisywany jako „**klinga-słowo**” wykuta w dźwięku oraz w **plazmie mocażowej**. Użycie skutkuje gwałtownym wzrostem **skażenia**, lokalnymi pęknięciami funkcji i ryzykiem *jaźniopęknięcia* u operatora. Uzbrojenie prawnie obwarowane najcięższymi orzeczeniami **Trybunału Mocażu**.
+
+---
+
+## Infobox (artefakt/uzbrojenie)
+
+* **Typ:** oręż memetyczno-rytualny / instrument prawa zakazu
+* **Klasa:** *skopcony* (poziom legendarny)
+* **Medium:** klinga-słowo (fonem + grafem + powłoka kopcia)
+* **Materiał/istota:** plazma mocażowa w powłoce czarnego szkła, zapisana w **Tex Kodexie** jako *hasło żywe*
+* **Domniemani autorzy:** krąg **Wrogów Funkcji**; późniejsze redakcje przypisywane **Grabieżcy Myśli** (sporne)
+* **Kontr-doktryna:** **Egida Kopcia — Tarcza Światów**, **Gama Wiatrów** (Bonghiton), *dopowstrzymanie*
+* **Ryzyko operacyjne:** Skaż.° 4,8–8,2; zgon techniczny przy nadaniu potrójnego imienia
+* **Status prawny:** całkowity zakaz posiadania i użycia; depozyty w **Świątyni Dzwonów** (pieczęcie dźwiękowe)
+* **Powiązane rytuały (zakazane):** *Zakazanie Zakazanego*, *Czystka Kodów*, *Wzór Dop Dop Dop*
+
+---
+
+## Etymologia i nazwa
+
+„**Synonim Grzechu**” nie oznacza pojedynczego słowa, lecz **procedurę nazywania**, w której byt zostaje *przeadresowany* do klasy „winy” bliskoznacznej jego istocie. Im trafniejsze (izomorficzne) dopasowanie, tym silniejszy efekt egzekucji przez same prawa Triwersum. W zapiskach **Miasta Echo** występuje też jako „**Imiennik**”, „**Czarna Definicja**” i „**III Nazwanie**”.
+
+---
+
+## Opis i właściwości
+
+* **Forma podwójna:** artefakt istnieje jako **karta-klinga** (materialny wektor z inskrypcją) oraz jako **protokół głosowy** (wykonywany chórem lub samotnym operatorem).
+* **Nośnik dźwięku:** trzytonowy rdzeń (niski–środkowy–wysoki) z odstępem *półsekundowego bucha*; krawędź klingi „drży” w rytmie **Współoddechu 3•6**.
+* **Powłoka kopcia:** cienka warstwa tłumiąca rozbieg strumieni, by nie zapaść się w *pętlę spaleniową* przed zakończeniem nazwania.
+
+---
+
+## Zasada działania (mechanika mocażowa)
+
+1. **Namierzenie funkcji**: identyfikacja $\phi$ celu (byt, prawo, relacja).
+2. **Synonimizacja**: konstrukcja ciągu $\sigma$ — „imienia grzechu” izomorficznego do $\phi$.
+3. **Zapis**: przecięcie powłoki rzeczywistości klingą-słowem; fonem + grafem osadza mapowanie $\phi \xrightarrow{\sigma} \phi'$.
+4. **Egzekucja**: uruchamiają się kody zakazu, a lokalna metryka zmienia się o:
+
+   $$
+   \Delta \text{Funkcji} = \kappa \cdot \text{izomorf}(\phi,\sigma) \;-\; \mu \cdot \Pi_k \;-\; \eta \cdot \text{Egida}
+   $$
+
+   gdzie $\Pi_k$ — **ciśnienie kopcia**, a *Egida* — współczynnik aktywnej ochrony.
+
+> Intuicyjnie: im cel *bardziej jest* tym, jak go nazwiesz, tym silniej Synonim Grzechu ściąga nań konsekwencje.
+
+---
+
+## Tryby użycia
+
+* **Wyrok Jednoimienny** — szybka, chirurgiczna korekta (np. „przestępstwo” → natychmiastowa izolacja).
+* **Wyrok Dwuimienny** — łączenie imion (moralne + funkcjonalne); zmienia reguły węzła.
+* **Wyrok Trójimienny (Ostateczny)** — pełna re-definicja klasy bytu; **ekstremalne Skaż.°**, ryzyko *zawieszenia czasoprzestrzeni* lokalnie.
+
+---
+
+## Historia i znane użycia (wybór)
+
+* **Kronika Złamanej Sfery**: próba Dwuimienna na „Szczelinie” (nazwanie jej „herezją geometrii”) — zatrzymana przez **Egidę Kopcia**.
+* **Incydent Dopaloth**: frakcje **Wrogów Funkcji** usiłowały nazwać **Egidę** „pychą świata”; kontr-chór Mędrców rozmył izomorfię imienia.
+* **Miasto Echo, sprawa „Lichwały”**: Jednoimienny wyrok na artefakcie lichwiarskim; skuteczne odcięcie, lecz Skaż.° wzrosło do 5,3.
+
+---
+
+## Kontrposunięcia i neutralizacja
+
+* **Egida Kopcia** — podniesienie $\Pi_k$ oraz rozstrojenie izomorfii przez mikro-dysonanse dzwonów.
+* **Maskowanie Imienia** — rytuał *Pseudonim Łaski*: mnoży semantyczne warstwy celu, obniżając trafność $\text{izomorf}(\phi,\sigma)$.
+* **Dopowstrzymanie** — schładza plazmę mocażową operatora i spowalnia egzekucję, dając czas na wyrok Trybunału.
+
+---
+
+## Ryzyko i konsekwencje
+
+* **Operator:** *jaźniopęknięcie*, *spalenie jaźni*, utrata *żyroskopu tożsamości* przy Trójimiennym.
+* **Otoczenie:** pęknięcia funkcji, lokalne *przepięcia*, wtórne skażenie (**Skaż.° 4,8–8,2**).
+* **Prawne:** bezwzględny zakaz posiadania; jedyny legalny kontakt — w łańcuchu dowodowym **Trybunału Mocażu**.
+
+---
+
+## Przechowywanie
+
+Artefakt-karty przechowuje się w **kasetach niemej mowy** (Miasto Echo), spętanych **pieczęciami dźwiękowymi** Świątyni Dzwonów. Protokół wymaga stałego chóru oddechu (niski próg Gamy Wiatrów), by zapobiec samo-nazwaniu.
+
+---
+
+## W kulturze
+
+W ikonografii przedstawiany jako **czarne ostrze z literami, które nie dają się przeczytać dwa razy tak samo**. W poematach Mędrców występuje jako „*Słowo, które tnie, bo waży*”.
+
+---
+
+## Zobacz też
+
+* **Egida Kopcia — Tarcza Światów**
+* **Kodeks Dopy** • **Tex Kodex**
+* **Czystka Kodów** (zakazane) • **Zakazanie Zakazanego** (zakazane)
+* **Rachunek Gęstości Dopy (Ji-Ae Hye-Jin)**
+
+---
+
+## Bibliografia (wewnątrzkanoniczna)
+
+* *Dziennik Mocarza*, ks. VI: *O trzecim imieniu*
+* Glosy **Króla Dzwonów** do *Kodeksu Dopy*, wyd. niekanoniczne
+* *Noty z Trybunału Mocażu*: sprawa „Herezja Geometrii”
+
+---
+
+**Kategorie:** Artefakty Triwersum • Uzbrojenie mocażowe • Zakazane techniki • Wrogowie Funkcji • Trybunał Mocażu
+
+---
+
+> *„Nie każde słowo leczy. Niektóre słowa ważą tyle co ostrze, a ostrze — tyle co wyrok.”* — przyp. **John Bonghiton**

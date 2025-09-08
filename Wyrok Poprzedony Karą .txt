@@ -1,0 +1,128 @@
+# Wyrok Poprzedzony Karą — Arcymistrzowie (Triwersumpedia)
+
+**Wyrok Poprzedzony Karą** (spot. też: **Wyrok Poprzedony Karą** – pisownia archaizująca z Miasta Echo) — skrajna doktryna sędziowsko-rytualna **Trybunału Mocażu**, dopuszczająca *odwrócenie porządku sprawiedliwości*: **najpierw** aplikacja minimalnej, odwracalnej kary (węzłowej), **potem** dochodzenie do prawdy i formalny wyrok. Wokół doktryny powstała elitarna korporacja **Arcymistrzów Wyroku Poprzedzonego Karą** (w skrócie: **Arcymistrzowie**), szkolona do pracy na granicy **powłoki kopcia**, *dopowstrzymania* i **Egidy Kopcia**.
+
+Praktyka jest prawnie **ściśle reglamentowana** (mandaty stanów wyjątkowych) i obwarowana pieczęciami Świątyni Dzwonów ze względu na ryzyka: wzrost **Skaż.°**, *przepięcia* w węzłach oraz zagrożenie *jaźniopęknięciem* u operatora i poddanego.
+
+---
+
+## Infobox (doktryna / korporacja sędziowska)
+
+* **Nazwa:** Wyrok Poprzedzony Karą
+* **Rodzaj:** doktryna prawno-rytualna Trybunału / elitarna korporacja orzecznicza
+* **Motto:** *„Zgaś płomień, zanim nazwiesz ogień.”*
+* **Afiliacja:** **Trybunał Mocażu** (skrzydło egzekucyjne, status sporny)
+* **Założenie (kanon):** okres **Złamanej Sfery**; kodyfikacja w *Glosie §Δ-7 „O odwróceniu kolejności”*
+* **Siedziby:** **Świątynia Dzwonów** (dziedziniec Sądów Szybkich), **Miasto Echo** (Laboratorium Węzłów)
+* **Symbole:** odwrócona klepsydra z mikro-dzwonem; pętla z zaznaczoną „fazą kary” przed węzłem wyroku
+* **Kluczowe techniki:** *Kara Zerowa*, *Pół-Zawieszenie Węzła*, *Maska Oddechu 3•6*, *Egida w kontrfazie*
+* **Ryzyko operacyjne:** Skaż.° 2,9–6,4 (zależnie od promienia i czasu)
+* **Status prawny:** dozwolona wyłącznie na **Mandat Szary** z potrójną pieczęcią Dzwonów (czasowo, lokalnie)
+
+---
+
+## Zarys doktryny
+
+Ideą Wyroku Poprzedzonego Karą jest **wymuszenie stabilnego stanu początkowego** w badanym węźle poprzez krótką, odwracalną karę (np. izolację funkcji, punktowe obniżenie *ciśnienia kopcia*, czasową utratę przywilejów mocażu). W tym stanie łatwiej ujawnia się ścieżka przyczynowa — prawda „wychodzi, bo nie ma już czego bronić”. Arcymistrzowie utrzymują, że **kara minimalna** nie jest zemstą, lecz **narzędziem pomiaru**.
+
+Krytycy (m.in. **Król Dzwonów**) wskazują, że *kolejność ma wymiar etyczny i akustyczny*: dzwon bije **po** wejściu, nie **przed**.
+
+---
+
+## Mechanika mocażowa (skrót)
+
+Wyrok poprzedzony karą operuje na **fazowaniu** trzech wielkości:
+
+* **Πₖ** — *ciśnienie kopcia* (lokalne hamowanie pęknięć funkcji),
+* **ρₘ** — *gęstość mocażu* (nośność powłoki),
+* **χᵥ** — *współczynnik woli* poddanego (odporność semantyczna).
+
+Wariant pomiarowy (formuła wewnętrzna):
+
+$$
+\frac{\partial \psi}{\partial t} \bigg|_{\text{po karze}} \approx 
+\alpha \cdot \frac{1}{\Pi_k} + \beta \cdot \frac{1}{\rho_m} - \gamma \cdot \chi_v,
+$$
+
+gdzie $\psi$ — gradient ujawnienia prawdy (stabilizacja narracji). **Kara Zerowa** modyfikuje $\Pi_k$ i $\rho_m$ *przed* formalnym nadaniem imienia sprawie, obniżając szum strumienia.
+
+---
+
+## Techniki i procedury
+
+### Kara Zerowa
+
+Minimalny bodziec węzłowy (zimne odsprzęgnięcie od strumienia, bez cierpienia cielesnego), serwowany na **Współoddech 3•6**. Musi być **odwracalny** w czasie krótszym niż trzy pełne cykle dzwonu.
+
+### Pół-Zawieszenie Węzła
+
+Nie mylić z **Zawieszeniem Czasoprzestrzeni** (zakazane). Chodzi o krótkie *zamrożenie metryk pomocniczych* bez ingerencji w bieg zdarzeń; technika legalna tylko przy aktywnej **Egidzie Kopcia**.
+
+### Maska Oddechu 3•6
+
+Nakładka oddechowa na chór śledczy — rozstraja *emocjonalne* składowe głosu, by zredukować wpływ **Szalbiercy Emocji** (dziedzictwo kontr-doktryn).
+
+### Egida w kontrfazie
+
+Ustawienie Egidy tak, by tłumić *przepięcia* wywołane Karą Zerową i nie dopuścić do *pętli spaleniowej*.
+
+---
+
+## Hierarchia i tytuły Arcymistrzów
+
+* **Arcymistrz Wyroku** — prowadzi procedurę, odpowiada za metrykę i etykę.
+* **Rachmistrz Dopy** — monitoruje Skaż.° i bilans *Woli* (tradycja **Ji-Ae Hye-Jin**).
+* **Dzwonnik-Audytor** — utrzymuje matrycę dźwięku i pieczęcie czasowe.
+* **Protokolant Tex Kodexu** — zapis fonemiczno-grafemiczny (unikalna „karta sprawy”).
+
+**Znani Arcymistrzowie (wybór):** *Lord Bonglord* (prekursor praktyk pomiarowych), *Hazet* (szkoła kontrfaz Egidy), *Placek* (sprawy obyczajowe, kontrowersyjny), *Samaranitanin* (audytor etyczny), *Franklo* (kody stanów wyjątkowych).
+
+---
+
+## Historia i sprawy głośne
+
+* **Złamana Sfera (kanoniczne źródło):** pierwsze zastosowanie Kary Zerowej na węźle miejskim, by powstrzymać *rozbuch*; orzeczenie utrzymane, procedura uznana za skuteczną **ad hoc**.
+* **Sprawa „Herezji Geometrii”:** próba nadania imienia *Synonimem Grzechu* przerwana przez Arcymistrzów; zastosowano Wyrok Poprzedzony Karą w celu odtworzenia ścieżki przyczynowej szczeliny — sukces częściowy (Skaż.° 4,2).
+* **Incydent Dopaloth (protokoły cmentarne):** doktryna użyta defensywnie do izolacji memetycznej przed kontr-nazwaniem („pycha świata”); współpraca z **Egidą Kopcia**.
+
+---
+
+## Prawo i kontrowersje
+
+* **Mandat Szary:** jedyna podstawa prawna dopuścić procedurę; wymaga **potrójnej pieczęci Dzwonów** (Dzwon Niski, Średni, Wysoki) i obecności Audytora Etycznego.
+* **Zarzuty:** odwrócenie porządku krzywdzi niewinnych; ryzyko „samouzasadniającej” się kary.
+* **Obrona:** kara jest *odwracalnym stanem pomiarowym*, nie represją; bez niej część prawdy nie ujawnia się w ogóle (argument szkoły **Bonglord-Hazet**).
+
+---
+
+## Relacje z innymi doktrynami i artefaktami
+
+* **Egida Kopcia — Tarcza Światów:** warunek bezpieczeństwa; Arcymistrzowie bez Egidy działają nielegalnie.
+* **Synonim Grzechu:** doktryna konkurencyjna/antagonistyczna — zamiast *nadawać winę słowem*, Arcymistrzowie *wyciągają prawdę pomiarem*.
+* **Kodeks Dopy / Tex Kodex:** źródła glos §Δ-7 i formularzy „Kary Zerowej”.
+
+---
+
+## W kulturze
+
+Wyrok Poprzedzony Karą bywa przedstawiany jako **odwrócona klepsydra**: piasek (kara) spada najpierw, by odsłonić kształt szkła (prawdę). W poematach Mędrców — „**dzwon, co bije przed progiem**”.
+
+---
+
+## Zobacz też
+
+* **Trybunał Mocażu** • **Egida Kopcia — Tarcza Światów**
+* **Synonim Grzechu — oręż ostateczny**
+* **Rachunek Gęstości Dopy (Ji-Ae Hye-Jin)** • **Gama Wiatrów (John Bonghiton)**
+
+---
+
+## Źródła (wewnątrzkanoniczne)
+
+* *Glosa §Δ-7 „O odwróceniu kolejności”* (Tex Kodex, wyd. niekanoniczne)
+* *Dziennik Mocarza*, ks. VI–VIII: *O pomiarze winy*
+* Protokół **Świątyni Dzwonów**: *Mandaty Szare i audyty etyczne*, wyd. Miasto Echo
+
+---
+
+> *„Dzwon ma pierwszeństwo przed mieczem. Jeśli bije zanim wejdziesz, to nie ostrzega — on już policzył twój krok.”* — **Król Dzwonów**

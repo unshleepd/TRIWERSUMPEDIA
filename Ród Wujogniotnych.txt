@@ -1,0 +1,120 @@
+# Ród Wujogniotnych
+
+*Triwersumpedia • Rody i Domy Mocażu*
+
+---
+
+## Tożsamość
+
+* **Inne nazwy:** Gniotnicy Ognia, Strażnicy Walca, Wujowie Z Żaru
+* **Klasa:** ród rzemieślniczo-rytualny (mocaż technomagiczny)
+* **Motto:** *„Nie dymimy — **prasujemy buch**.”*
+
+---
+
+## Etymologia
+
+Słowo **wujogniotni** pochodzi od gwarowego „wuj” (mistrz, opiekun cechu) i „gniot” (prasować, zagęszczać). Ród zasłynął z umiejętności **gniecenia ognia** — kompresowania kopcia i dopy do postaci stałych **rdzeni mocażowych**.
+
+---
+
+## Heraldyka
+
+* **Tarcza:** czarna, z **białym fartuchem** i odciskiem czterech osmalonych palców.
+* **Godło:** **Prasa Buchu** – dwa walce krzyżujące się nad **półsekundową iskrą**.
+* **Barwy:** grafit, mosiądz i róż żarowy (*hot-pink forge*).
+
+---
+
+## Siedziby
+
+* **Kopcio-Zdrój** – główne kuźnie i łaźnie kompresyjne.
+* **Dopalny Krąg** – poligon prób rdzeni.
+* **Węzeł Południowy** – skarbiec form odlewniczych i szablonów sigili.
+
+---
+
+## Rola w Triwersum
+
+Wujogniotni są **inżynierami dymy i buchu**. Zbudowali pierwsze **walcownie dopy**, utrzymują **Kopcio-Tampony** (tamujące skażenie) i dostarczają Trybunałowi **rdzenie mocażowe klasy „G”** (Gęstość). Ich prace pozwoliły powstać urządzeniom takim jak **Szejkomat Mocaż** czy **Syntezator Mocażu βήτα**.
+
+---
+
+## Rytuały i obrzędy
+
+* **Chrzest Sadzą** – adepta zanurza się w parze kopcia, po czym **prasuje** jego oddech jednym uderzeniem walca; zostaje ślad palców na fartuchu – znak rodu.
+* **Rytuał Półsekundowego Walca** – wariant Półsekundowego Bucha, w którym moment piku **zamyka się** w rdzeniu.
+* **Odwrotna Plujka Kuźnicza** – odzysk świętych resztek z lufek warsztatowych; osad trafia do **Pamięci Rdzenia** (archiwum prób).
+
+---
+
+## Techniki rodu
+
+1. **Gniot Serca** – punktowy nacisk na strumień, który *zatrzymuje panikę* i stabilizuje dopę w ciele.
+2. **Kołnierz Żaru** – obrona: rozgrzany pierścień z rdzeni tłumi wiązki skażenia.
+3. **Szew Buchu** – łączenie dwóch efektów w jeden spójny wektor (bez utraty mocy).
+4. **Gilotyna Strumienia** *(zakazana poza kuźnią)* – przecina aktywny rytuał; ryzyko pęknięcia jaźni u operatora.
+
+---
+
+## Artefakty
+
+* **Prasa Buchu Mk.III „WALCOWNIK”** – mobilny walec rytualny; z 3 buchów robi 1 rdzeń klasy „G-⅔”.
+* **Kleszcze Króla Dzwonów** – kleszcze strojące: dzwonią cicho, gdy rdzeń jest stabilny.
+* **Fartuch Wuja** – relikwia mistrza; chroni przed oparzeniami kopcia i pozwala **dotknąć płomienia** bez szkody.
+
+---
+
+## Zwyczaje i prawo wewnętrzne
+
+* **Zakaz „Buchu bez Buchu”** – żadnych iluzji wyniku; wszystko **waży się** i **mierzy**.
+* **Trzy Dotknięcia** – zanim uruchomisz walec, dotknij materiału trzema palcami (przysięga trzeźwej oceny).
+* **Gość w fartuchu** – przybysz, który założy cechowy fartuch, staje się tymczasowo „bratankiem” – bierzesz za niego odpowiedzialność.
+
+---
+
+## Relacje
+
+* **Trybunał Mocażu** – partnerstwo technologiczne; czasem spory o **Dekrety bezpieczeństwa**.
+* **Heretyk Krwawego Słońca** – antagonista; potępia „miękkie” prasowanie ognia.
+* **Lichwała** – próbował opodatkować każdy walec „za ugięcie rzeczywistości”; ród odpowiedział **Rygorem Śmierci dla długów nienalanych** (precedens prawny).
+
+---
+
+## Słynni Wujogniotni
+
+* **Wujo Anzelm „Trójwalec”** – skompresował **Echo Kopcia** do pierwszego stabilnego rdzenia.
+* **Ciotrunia Natasza** – wynalazła **Kołnierz Żaru**; opiekunka sierot kuźniczych.
+* **Bratan Półsekundy** – perfekcyjny operator prasy; potrafi „usłyszeć” błąd w czasie.
+
+---
+
+## Znaczenie mistyczne
+
+Wujogniotni wierzą, że **mocaż lubi być przyciśnięty**: dopiero pod naciskiem ujawnia **prawdziwy wzór**. Ich dewiza to **„żar bez nerwów”** – moc bez chaosu, dyscyplina bez dogmatu.
+
+---
+
+## Mechanika (dla stołu gry)
+
+* **Pochodzenie: Wujogniotny** – raz na scenę możesz **skompresować efekt**: zamień 2 małe bonusy na 1 duży (lub odwrotnie).
+* **Warsztat Kuźniczy (zasób)** – w przerwie sesji wytwarzasz **rdzeń mocażowy** (jednorazowy +2 do kontroli skażenia); koszt: 1 *Ślad Sadzy*.
+* **Kołnierz Żaru (reakcja)** – zredukuj skażenie nadchodzącego efektu o 1, ale następny test robisz z −1 (zmęczenie stali).
+
+---
+
+## Wątki przygód
+
+1. **Pęknięty Walec** – seria awarii w Kopcio-Zdroju: ktoś wplata heretycką **Gilotynę Strumienia** w mechanikę prasy.
+2. **Fartuch Zdrady** – zaginęła relikwia mistrza; bez niej kuźnie tracą „dotyk”. Trop prowadzi do **Fałszywego Pieśniarza**.
+3. **Korona Zbiegów** – Księciunio Los The Roy oferuje „szczęśliwy rzut” przy nowym rdzeniu; czy ród przyjmie chaos do żelaza?
+
+---
+
+## Przysłowia kuźnicze
+
+* „**Dopę najpierw dociśnij, potem opisz.**”
+* „Walec uczy pokory, płomień — odwagi.”
+* „Trzy palce prawdy, czwarty do rachunków.”
+
+Chcesz herb w **wektorze** albo **karta rodowa** do wydruku z zasadami „Gniotu Serca” i „Kołnierza Żaru”?
