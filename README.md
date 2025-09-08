@@ -1,3 +1,6 @@
+[![Licencja CC BY-NC-SA](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](LICENSE)
+[![Status Projektu](https://img.shields.io/badge/Status-Aktywnie_rozwijany-brightgreen)](https://github.com/unshleepd/TRIWERSUMPEDIA/issues)
+
 # 📜 TRIWERSUMPEDIA: BIBLIOTEKA ŚWIĘTYCH ARTYKUŁÓW
 
 > _Archiwum Wiedzy, Filozofii i Historii Triwersum_
