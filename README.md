@@ -80,6 +80,7 @@ Dołączenie do grona kronikarzy Triwersum jest **rytuałem**, a nie zwykłą pr
    Sklonuj tę Bibliotekę na swój własny warsztat:  
    ```bash
    git clone https://github.com/unshleepd/TRIWERSUMPEDIA.git
+   ```
 2. **Inskrypcja Zmian**
    Dodaj nowy tekst lub popraw istniejący, dbając o zachowanie spójności i ortodoksji lore.
    Format: plik .txt z jasnym tytułem i kategorią w nagłówku.
