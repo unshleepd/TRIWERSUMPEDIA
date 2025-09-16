@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import font as tkfont
+from tkinter import font as tkfont, messagebox
 from functools import partial
 
 # --- Data Classes ---
@@ -14,14 +14,29 @@ class Item:
     def __init__(self, name, description, item_type="misc"): self.name, self.description, self.item_type = name, description, item_type
 class Equipment(Item):
     def __init__(self, name, description, slot, bonuses=None): super().__init__(name, description, item_type="equipment"); self.slot, self.bonuses = slot, bonuses if bonuses else {}
+
 class Player:
     def __init__(self, x, y):
         self.x, self.y = x, y
         self.gd_max, self.gd, self.sm_max, self.sm, self.wgk = 100, 100, 50, 50, 0
+        self.level, self.xp, self.xp_to_next_level = 1, 0, 100
         self.inventory = [Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20})]
         self.equipment = {"Ręka": None, "Ciało": None}
         self.quest_journal = {}
         self.skills = [Skill("Zwykły Atak", 0, 8), Skill("Harmoniczne Uderzenie", 10, 20)]
+
+    def _level_up(self):
+        self.xp -= self.xp_to_next_level; self.level += 1
+        self.xp_to_next_level = int(self.xp_to_next_level * 1.5)
+        self.gd_max += 10; self.sm_max += 5
+        self.gd = self.gd_max; self.sm = self.sm_max
+
+    def add_xp(self, amount):
+        self.xp += amount
+        leveled_up = False
+        while self.xp >= self.xp_to_next_level: self._level_up(); leveled_up = True
+        return leveled_up
+
     def add_quest(self, quest):
         if quest.key not in self.quest_journal: quest.status = "active"; self.quest_journal[quest.key] = quest
     def add_item(self, item): self.inventory.append(item)
@@ -38,10 +53,11 @@ class Player:
             for stat, value in item.bonuses.items(): setattr(self, stat, getattr(self, stat) - value)
             self.gd = min(self.gd, self.gd_max); return True
         return False
+
 class NPC:
     def __init__(self, x, y, name, dialogue_key): self.x, self.y, self.name, self.dialogue_key = x, y, name, dialogue_key
 class Enemy:
-    def __init__(self, x, y, name, gd, skills): self.x, self.y, self.name, self.gd, self.skills = x, y, name, gd, skills
+    def __init__(self, x, y, name, gd, skills, xp_reward): self.x, self.y, self.name, self.gd, self.skills, self.xp_reward = x, y, name, gd, skills, xp_reward
 
 # --- Game Logic ---
 
@@ -49,16 +65,10 @@ class GameLogic:
     def __init__(self, grid_width, grid_height):
         self.grid_width, self.grid_height = grid_width, grid_height
         self.player = Player(grid_width // 2, grid_height // 2)
-
         self.items = {"kleszcze": Equipment("Kleszcze Króla Dzwonów", "Zwiększa maks. SM o 15.", "Ręka", bonuses={"sm_max": 15})}
         self.npcs = [NPC(5, 5, "Mędrzec Ji-Ae", "ji_ae_start"), NPC(2, 9, "Lord Bonglord", "bonglord_start")]
-        self.enemies = [Enemy(10, 8, "Wróg Funkcji", 50, [Skill("Cios Funkcyjny", 0, 8)]), Enemy(12, 2, "Siewca Paradygmatu", 80, [Skill("Cios Paradygmatu", 0, 12)])]
-
-        self.quests = {
-            "bonglord_quest": Quest("bonglord_quest", "Próba Harmonii", "Pomóż Lordowi Bonglordowi zbadać zakłócenia.",
-                [Objective("Porozmawiaj z Mędrcem Ji-Ae", "talk_to", "Mędrzec Ji-Ae"), Objective("Pokonaj Siewcę Paradygmatu", "defeat", "Siewca Paradygmatu")],
-                reward={"type": "item", "key": "kleszcze"})
-        }
+        self.enemies = [Enemy(10, 8, "Wróg Funkcji", 50, [Skill("Cios Funkcyjny", 0, 8)], 40), Enemy(12, 2, "Siewca Paradygmatu", 80, [Skill("Cios Paradygmatu", 0, 12)], 75)]
+        self.quests = {"bonglord_quest": Quest("bonglord_quest", "Próba Harmonii", "Pomóż Lordowi Bonglordowi.", [Objective("Porozmawiaj z Mędrcem Ji-Ae", "talk_to", "Mędrzec Ji-Ae"), Objective("Pokonaj Siewcę Paradygmatu", "defeat", "Siewca Paradygmatu")], reward={"type": "item", "key": "kleszcze"})}
         self.dialogues = self.get_dialogues()
 
     def get_entity_at(self, x, y):
@@ -72,33 +82,32 @@ class GameLogic:
             if isinstance(entity, NPC): return ("interact", entity)
             if isinstance(entity, Enemy): return ("combat", entity)
         if 0 <= target_x < self.grid_width and 0 <= target_y < self.grid_height and abs(target_x - self.player.x) + abs(target_y - self.player.y) == 1:
-            self.player.x, self.player.y = target_x, target_y
-            return ("move", None)
+            self.player.x, self.player.y = target_x, target_y; return ("move", None)
         return ("invalid", None)
 
     def handle_combat_turn(self, player_skill, enemy):
-        log = []
-        if self.player.sm < player_skill.cost: log.append("Brak Strumienia Mocażu!"); return log
+        log, events = [], []
+        if self.player.sm < player_skill.cost: log.append("Brak Strumienia Mocażu!"); return log, events
         self.player.sm -= player_skill.cost; enemy.gd -= player_skill.damage
         log.append(f"Używasz '{player_skill.name}' i zadajesz {player_skill.damage} obrażeń.")
         if enemy.gd <= 0:
-            log.append(f"{enemy.name} został pokonany!"); self.update_quest_progress("defeat", enemy.name); self.enemies.remove(enemy); return log
+            log.append(f"{enemy.name} został pokonany!")
+            if self.player.add_xp(enemy.xp_reward): events.append("level_up")
+            self.update_quest_progress("defeat", enemy.name); self.enemies.remove(enemy); return log, events
         enemy_skill = enemy.skills[0]
         self.player.gd -= enemy_skill.damage
         log.append(f"{enemy.name} używa '{enemy_skill.name}' i rani cię za {enemy_skill.damage} obrażeń.")
         if self.player.gd <= 0: log.append("Zostałeś pokonany...")
-        return log
+        return log, events
 
-    def start_quest(self, quest_key):
-        if quest_key in self.quests: self.player.add_quest(self.quests[quest_key])
-
+    def start_quest(self, key):
+        if key in self.quests: self.player.add_quest(self.quests[key])
     def update_quest_progress(self, event_type, target_name):
         for quest in self.player.quest_journal.values():
             if quest.status == "active":
-                for objective in quest.objectives:
-                    if objective.target_type == event_type and objective.target_name == target_name: objective.is_done = True
-                if all(obj.is_done for obj in quest.objectives):
-                    quest.status = "completed"
+                for obj in quest.objectives:
+                    if obj.target_type == event_type and obj.target_name == target_name: obj.is_done = True
+                if all(obj.is_done for obj in quest.objectives): quest.status = "completed"
 
     def get_dialogues(self):
         return {
@@ -129,7 +138,7 @@ class TriwersumGame:
         frame = tk.Frame(parent, bg="#2c2c2c"); frame.pack(pady=(0, 10), fill=tk.X)
         tk.Label(frame, text="STATYSTYKI", font=self.bold_font, bg="#2c2c2c", fg="white").pack(pady=10)
         labels = {}
-        for k, t in {"GD": "GD", "SM": "SM", "WGK": "WGK"}.items():
+        for k, t in {"LVL": "Poziom", "XP": "XP", "GD": "GD", "SM": "SM", "WGK": "WGK"}.items():
             f = tk.Frame(frame, bg="#2c2c2c"); f.pack(fill=tk.X, padx=10, pady=2)
             tk.Label(f, text=f"{t}:", font=self.bold_font, bg="#2c2c2c", fg="#aaa").pack(side=tk.LEFT)
             labels[k] = tk.Label(f, text="", font=self.bold_font, bg="#2c2c2c", fg="white"); labels[k].pack(side=tk.RIGHT)
@@ -143,6 +152,8 @@ class TriwersumGame:
 
     def update_stats_display(self):
         p = self.game_logic.player
+        self.stats_labels["LVL"].config(text=str(p.level))
+        self.stats_labels["XP"].config(text=f"{p.xp}/{p.xp_to_next_level}")
         self.stats_labels["GD"].config(text=f"{p.gd}/{p.gd_max}")
         self.stats_labels["SM"].config(text=f"{p.sm}/{p.sm_max}")
         self.stats_labels["WGK"].config(text=str(p.wgk))
@@ -188,21 +199,19 @@ class TriwersumGame:
                 if item.item_type == "equipment": tk.Button(f, text="Wyposaż", command=partial(self.on_equip, item, refresh), bg="#444", fg="white", relief=tk.FLAT).pack(side=tk.RIGHT)
         refresh()
 
-    def on_equip(self, item, refresh_callback):
-        if self.game_logic.player.equip(item): self.update_stats_display(); refresh_callback()
-    def on_unequip(self, item, refresh_callback):
-        if self.game_logic.player.unequip(item): self.update_stats_display(); refresh_callback()
+    def on_equip(self, item, cb):
+        if self.game_logic.player.equip(item): self.update_stats_display(); cb()
+    def on_unequip(self, item, cb):
+        if self.game_logic.player.unequip(item): self.update_stats_display(); cb()
 
     def open_quest_log_window(self):
         win = tk.Toplevel(self.root); win.title("Dziennik Questów"); win.configure(bg="#2c2c2c"); win.grab_set()
-        if not self.game_logic.player.quest_journal:
-            tk.Label(win, text="Brak aktywnych questów.", font=self.bold_font, bg="#2c2c2c", fg="white").pack(pady=20, padx=20)
+        if not self.game_logic.player.quest_journal: tk.Label(win, text="Brak aktywnych questów.", font=self.bold_font, bg="#2c2c2c", fg="white").pack(pady=20, padx=20)
         for quest in self.game_logic.player.quest_journal.values():
-            color = {"active": "yellow", "completed": "lightgreen"}.get(quest.status, "white")
+            color = {"active": "yellow", "completed": "lightgreen", "rewarded": "lightblue"}.get(quest.status, "white")
             f = tk.Frame(win, bg="#444", bd=1, relief=tk.RIDGE); f.pack(pady=5, padx=10, fill=tk.X)
             tk.Label(f, text=f"{quest.title} [{quest.status.upper()}]", font=self.bold_font, bg="#444", fg=color).pack(anchor="w")
-            for obj in quest.objectives:
-                tk.Label(f, text=f"- {obj.description}", bg="#444", fg="lightgreen" if obj.is_done else "white").pack(anchor="w")
+            for obj in quest.objectives: tk.Label(f, text=f"- {obj.description}", bg="#444", fg="lightgreen" if obj.is_done else "white").pack(anchor="w")
 
     def open_dialogue_window(self, npc):
         win = tk.Toplevel(self.root); win.title(f"Rozmowa z {npc.name}"); win.configure(bg="#2c2c2c"); win.grab_set()
@@ -219,7 +228,7 @@ class TriwersumGame:
                     elif o.get("action") == "update_quest": self.game_logic.update_quest_progress("talk_to", o["target"])
                     elif o.get("action") == "grant_reward":
                         q = self.game_logic.player.quest_journal.get(o["quest_key"])
-                        if q and q.reward: self.game_logic.player.add_item(self.game_logic.items[q.reward["key"]]); q.status = "rewarded"
+                        if q and q.reward and q.status != "rewarded": self.game_logic.player.add_item(self.game_logic.items[q.reward["key"]]); q.status = "rewarded"
                     if o["next"] == "end": win.destroy()
                     else: display(o["next"])
                 tk.Button(frame, text=option["label"], command=on_click, bg="#444", fg="white", relief=tk.FLAT).pack(fill=tk.X, pady=2, padx=10)
@@ -228,10 +237,8 @@ class TriwersumGame:
     def open_combat_window(self, enemy):
         win = tk.Toplevel(self.root); win.title(f"Walka: {enemy.name}"); win.configure(bg="#2c2c2c"); win.grab_set()
         info = tk.Frame(win, bg="#2c2c2c"); info.pack(pady=10, padx=10, fill=tk.X)
-        player_hp = tk.Label(info, font=self.bold_font, bg="#2c2c2c", fg="white")
-        player_hp.pack()
-        enemy_hp = tk.Label(info, font=self.bold_font, bg="#2c2c2c", fg="white")
-        enemy_hp.pack()
+        player_hp = tk.Label(info, font=self.bold_font, bg="#2c2c2c", fg="white"); player_hp.pack()
+        enemy_hp = tk.Label(info, font=self.bold_font, bg="#2c2c2c", fg="white"); enemy_hp.pack()
         log = tk.Text(win, height=8, width=60, bg="#1a1a1a", fg="white", relief=tk.FLAT, font=("Courier", 9)); log.pack(pady=10, padx=10)
         skills_frame = tk.Frame(win, bg="#2c2c2c"); skills_frame.pack(pady=10)
         def refresh():
@@ -249,8 +256,9 @@ class TriwersumGame:
                     if p.sm < skill.cost: btn.config(state=tk.DISABLED, bg="#555")
                     btn.pack(side=tk.LEFT, padx=5)
         def on_skill(skill):
-            entries = self.game_logic.handle_combat_turn(skill, enemy)
+            entries, events = self.game_logic.handle_combat_turn(skill, enemy)
             for entry in entries: log.insert(tk.END, entry + "\n"); log.see(tk.END)
+            if "level_up" in events: messagebox.showinfo("Awans!", f"Osiągnięto poziom {self.game_logic.player.level}!")
             refresh()
         refresh()
 
