@@ -3,6 +3,8 @@ from tkinter import font as tkfont, messagebox
 from functools import partial
 import json
 import os
+import random
+from map_generator import MapGenerator
 
 SAVE_FILE = "savegame.json"
 
@@ -25,28 +27,26 @@ class Item:
     def __init__(self, name, description, item_type="misc"): self.name, self.description, self.item_type = name, description, item_type
     def to_dict(self): return {"name": self.name, "type": self.item_type}
 class Equipment(Item):
-    def __init__(self, name, description, slot, bonuses=None): super().__init__(name, description, item_type="equipment"); self.slot, self.bonuses = slot, bonuses if bonuses else {}
-    def to_dict(self): data = super().to_dict(); data.update({"slot": self.slot, "bonuses": self.bonuses}); return data
+    def __init__(self, name, description, slot, bonuses=None):
+        super().__init__(name, description, item_type="equipment")
+        self.slot = slot
+        self.bonuses = bonuses if bonuses else {}
+    def to_dict(self):
+        data = super().to_dict()
+        data.update({"slot": self.slot, "bonuses": self.bonuses})
+        return data
 
 class Player:
     def __init__(self, x, y):
-        self.x, self.y = x, y
-        self.gd_max, self.gd, self.sm_max, self.sm, self.wgk = 100, 100, 50, 50, 0
+        self.x, self.y = x, y; self.gd_max, self.gd, self.sm_max, self.sm, self.wgk = 100, 100, 50, 50, 0
         self.level, self.xp, self.xp_to_next_level = 1, 0, 100
         self.inventory = [Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20})]
-        self.equipment = {"Ręka": None, "Ciało": None}
-        self.quest_journal = {}
+        self.equipment = {"Ręka": None, "Ciało": None}; self.quest_journal = {}
         self.skills = [Skill("Zwykły Atak", 0, 8), Skill("Harmoniczne Uderzenie", 10, 20)]
     def to_dict(self):
         return {"x": self.x, "y": self.y, "gd_max": self.gd_max, "gd": self.gd, "sm_max": self.sm_max, "sm": self.sm, "level": self.level, "xp": self.xp, "xp_to_next_level": self.xp_to_next_level, "inventory": [item.to_dict() for item in self.inventory], "equipment": {slot: item.to_dict() if item else None for slot, item in self.equipment.items()}, "quest_journal": {key: quest.to_dict() for key, quest in self.quest_journal.items()}}
     def _level_up(self):
-        self.xp -= self.xp_to_next_level
-        self.level += 1
-        self.xp_to_next_level = int(self.xp_to_next_level * 1.5)
-        self.gd_max += 10
-        self.sm_max += 5
-        self.gd = self.gd_max
-        self.sm = self.sm_max
+        self.xp -= self.xp_to_next_level; self.level += 1; self.xp_to_next_level = int(self.xp_to_next_level*1.5); self.gd_max += 10; self.sm_max += 5; self.gd = self.gd_max; self.sm = self.sm_max
     def add_xp(self, amount):
         self.xp += amount
         leveled_up = False
@@ -60,21 +60,16 @@ class Player:
     def equip(self, item):
         if item.item_type == "equipment" and item in self.inventory:
             if self.equipment.get(item.slot): self.unequip(self.equipment[item.slot])
-            self.inventory.remove(item)
-            self.equipment[item.slot] = item
+            self.inventory.remove(item); self.equipment[item.slot] = item
             for stat, value in item.bonuses.items(): setattr(self, stat, getattr(self, stat) + value)
-            self.gd = min(self.gd, self.gd_max)
-            return True
+            self.gd = min(self.gd, self.gd_max); return True
         return False
     def unequip(self, item):
         if item.item_type == "equipment" and item == self.equipment.get(item.slot):
-            self.equipment[item.slot] = None
-            self.inventory.append(item)
+            self.equipment[item.slot] = None; self.inventory.append(item)
             for stat, value in item.bonuses.items(): setattr(self, stat, getattr(self, stat) - value)
-            self.gd = min(self.gd, self.gd_max)
-            return True
+            self.gd = min(self.gd, self.gd_max); return True
         return False
-
 class NPC:
     def __init__(self, x, y, name, dialogue_key): self.x, self.y, self.name, self.dialogue_key = x, y, name, dialogue_key
 class Enemy:
@@ -84,30 +79,56 @@ class Enemy:
 # --- Game Logic ---
 
 class GameLogic:
-    def __init__(self, grid_width, grid_height): self.grid_width, self.grid_height = grid_width, grid_height; self.initialize_game_state()
+    def __init__(self, grid_width, grid_height):
+        self.grid_width, self.grid_height = grid_width, grid_height
+        self.map_layout = []
+        self.map_generator = MapGenerator(grid_width, grid_height)
+        self.initialize_game_state()
+
+    def _place_entities(self):
+        floor_regions = self.map_generator.find_regions(tile_type=0)
+        if not floor_regions: self.initialize_game_state(); return
+        largest_region = max(floor_regions, key=len)
+        entity_count = 1 + len(self.static_npcs) + len(self.static_enemies)
+        if len(largest_region) < entity_count:
+            print("Warning: Not enough space in the largest region to place all entities."); self.initialize_game_state(); return
+        spawn_points = random.sample(largest_region, entity_count)
+        player_pos = spawn_points.pop(); self.player = Player(player_pos[0], player_pos[1])
+        self.npcs = []; self.enemies = []
+        for npc_template in self.static_npcs:
+            pos = spawn_points.pop(); self.npcs.append(NPC(pos[0], pos[1], npc_template.name, npc_template.dialogue_key))
+        for name, (gd, skills, xp) in self.static_enemies.items():
+            pos = spawn_points.pop(); self.enemies.append(Enemy(pos[0], pos[1], name, gd, skills, xp))
+
     def initialize_game_state(self, from_save=None):
         self.items = {"kleszcze": Equipment("Kleszcze Króla Dzwonów", "Zwiększa maks. SM o 15.", "Ręka", bonuses={"sm_max": 15}), "fartuch": Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20})}
-        self.static_npcs = [NPC(5, 5, "Mędrzec Ji-Ae", "ji_ae_start"), NPC(2, 9, "Lord Bonglord", "bonglord_start")]
+        self.static_npcs = [NPC(0, 0, "Mędrzec Ji-Ae", "ji_ae_start"), NPC(0, 0, "Lord Bonglord", "bonglord_start")]
         self.static_enemies = {"Wróg Funkcji": (50, [Skill("Cios Funkcyjny", 0, 8)], 40), "Siewca Paradygmatu": (80, [Skill("Cios Paradygmatu", 0, 12)], 75)}
         self.quests = {"bonglord_quest": Quest("bonglord_quest", "Próba Harmonii", "Pomóż Lordowi Bonglordowi.", [Objective("Porozmawiaj z Mędrcem Ji-Ae", "talk_to", "Mędrzec Ji-Ae"), Objective("Pokonaj Siewcę Paradygmatu", "defeat", "Siewca Paradygmatu")], reward={"type": "item", "key": "kleszcze"})}
         if from_save: self.load_from_state(from_save)
         else:
-            self.player = Player(self.grid_width // 2, self.grid_height // 2)
-            self.npcs = list(self.static_npcs)
-            self.enemies = [Enemy(10, 8, "Wróg Funkcji", 50, [Skill("Cios Funkcyjny", 0, 8)], 40), Enemy(12, 2, "Siewca Paradygmatu", 80, [Skill("Cios Paradygmatu", 0, 12)], 75)]
+            self.map_layout = self.map_generator.generate_map()
+            self._place_entities()
         self.dialogues = self.get_dialogues()
-    def get_save_state(self): return {"player": self.player.to_dict(), "enemies": [e.to_dict() for e in self.enemies]}
+
+    def get_save_state(self): return {"player": self.player.to_dict(), "enemies": [e.to_dict() for e in self.enemies], "map_layout": self.map_layout}
     def load_from_state(self, state):
+        self.map_layout = state["map_layout"]
         p_data = state["player"]; self.player = Player(p_data["x"], p_data["y"])
-        for key in ["gd_max", "gd", "sm_max", "sm", "level", "xp", "xp_to_next_level"]: setattr(self.player, key, p_data[key])
-        self.player.inventory = [self.rebuild_item(item_data) for item_data in p_data["inventory"]]
-        self.player.equipment = {slot: self.rebuild_item(item_data) if item_data else None for slot, item_data in p_data["equipment"].items()}
-        self.player.quest_journal = {key: Quest.from_dict(q_data, **self.quests[key].__dict__) for key, q_data in p_data["quest_journal"].items()}
+        for key in ["gd_max", "gd", "sm_max", "sm", "level", "xp", "xp_to_next_level"]:
+            if key in p_data: setattr(self.player, key, p_data[key])
+        self.player.inventory = [self.rebuild_item(item_data) for item_data in p_data.get("inventory", [])]
+        self.player.equipment = {slot: self.rebuild_item(item_data) if item_data else None for slot, item_data in p_data.get("equipment", {}).items()}
+        for item in self.player.equipment.values():
+            if item and item.item_type == "equipment":
+                for stat, value in item.bonuses.items(): setattr(self.player, stat, getattr(self.player, stat) + value)
+        self.player.quest_journal = {key: Quest.from_dict(q_data, **self.quests[key].__dict__) for key, q_data in p_data.get("quest_journal", {}).items()}
         self.enemies = []
         for e_data in state["enemies"]:
             name, gd, skills, xp = e_data["name"], e_data["gd"], self.static_enemies[e_data["name"]][1], self.static_enemies[e_data["name"]][2]
             self.enemies.append(Enemy(e_data["x"], e_data["y"], name, gd, skills, xp))
     def rebuild_item(self, item_data):
+        if not item_data: return None
         for item in self.items.values():
             if item.name == item_data["name"]: return Equipment(item.name, item.description, item.slot, item.bonuses)
         return Item(item_data.get("name", "Unknown"), "Unknown")
@@ -122,11 +143,13 @@ class GameLogic:
             if entity.x == x and entity.y == y: return entity
         return None
     def move_player_or_interact(self, target_x, target_y):
+        if not (0 <= target_x < self.grid_width and 0 <= target_y < self.grid_height): return ("invalid", None)
+        if self.map_layout[target_x][target_y] == 1: return ("invalid", None)
         entity = self.get_entity_at(target_x, target_y)
         if entity:
             if isinstance(entity, NPC): return ("interact", entity)
             if isinstance(entity, Enemy): return ("combat", entity)
-        if 0 <= target_x < self.grid_width and 0 <= target_y < self.grid_height and abs(target_x - self.player.x) + abs(target_y - self.player.y) == 1:
+        if abs(target_x - self.player.x) + abs(target_y - self.player.y) == 1:
             self.player.x, self.player.y = target_x, target_y
             return ("move", None)
         return ("invalid", None)
@@ -139,8 +162,7 @@ class GameLogic:
         if enemy.gd <= 0:
             log.append(f"{enemy.name} został pokonany!")
             if self.player.add_xp(enemy.xp_reward): events.append("level_up")
-            self.update_quest_progress("defeat", enemy.name)
-            self.enemies.remove(enemy)
+            self.update_quest_progress("defeat", enemy.name); self.enemies.remove(enemy)
             return log, events
         enemy_skill = enemy.skills[0]
         self.player.gd -= enemy_skill.damage
@@ -196,9 +218,13 @@ class TriwersumGame:
         self.stats_labels["GD"].config(text=f"{p.gd}/{p.gd_max}")
         self.stats_labels["SM"].config(text=f"{p.sm}/{p.sm_max}")
         self.stats_labels["WGK"].config(text=str(p.wgk))
-    def draw_grid(self):
-        for i in range(self.grid_width+1): self.canvas.create_line(i*self.cell_size,0,i*self.cell_size,self.grid_height*self.cell_size,fill="#444")
-        for i in range(self.grid_height+1): self.canvas.create_line(0,i*self.cell_size,self.grid_width*self.cell_size,i*self.cell_size,fill="#444")
+    def draw_map(self):
+        self.canvas.delete("map_tile")
+        for x in range(self.grid_width):
+            for y in range(self.grid_height):
+                tile_type = self.game_logic.map_layout[x][y]
+                color = "#333" if tile_type == 1 else "#555"
+                self.canvas.create_rectangle(x*self.cell_size, y*self.cell_size, (x+1)*self.cell_size, (y+1)*self.cell_size, fill=color, outline=color, tags="map_tile")
     def draw_player(self):
         if self.player_rect: self.canvas.delete(self.player_rect)
         x1, y1 = self.game_logic.player.x*self.cell_size, self.game_logic.player.y*self.cell_size
@@ -212,7 +238,7 @@ class TriwersumGame:
             rect = self.canvas.create_rectangle(x1, y1, x1+self.cell_size, y1+self.cell_size, fill=color, outline=f"light{color}", width=2)
             self.entity_rects[entity.name] = rect
     def refresh_all_ui(self):
-        self.draw_grid(); self.draw_entities(); self.draw_player(); self.update_stats_display()
+        self.draw_map(); self.draw_entities(); self.draw_player(); self.update_stats_display()
     def handle_map_click(self, event):
         action, data = self.game_logic.move_player_or_interact(event.x//self.cell_size, event.y//self.cell_size)
         if action == "move": self.draw_player()
@@ -300,7 +326,9 @@ class TriwersumGame:
 
 def main():
     try:
-        root = tk.Tk(); game = TriwersumGame(root); root.mainloop()
+        root = tk.Tk()
+        game = TriwersumGame(root)
+        root.mainloop()
     except tk.TclError:
         print("Could not open display. This is expected in a headless environment.")
 
