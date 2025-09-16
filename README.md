@@ -90,3 +90,38 @@ Dołączenie do grona kronikarzy Triwersum jest **rytuałem**, a nie zwykłą pr
    Cierpliwie oczekuj na decyzję Strażników Kanonu (opiekunów repozytorium). Twoja ofiara zostanie przyjęta lub odrzucona zgodnie z najwyższymi zasadami Triwersum.
 5. **Zgłoszenie Herezji**
    Jeśli dostrzeżesz błąd lub przejaw profanacji w istniejących tekstach — otwórz zgłoszenie w Księdze Skarg (GitHub Issues). Archiwiści rozważą każdy donos o nieścisłościach w lore.
+
+---
+
+## 🎮 TRIWERSUM: THE ROGUELIKE GAME
+
+W tym repozytorium znajduje się również prototyp gry typu roguelike osadzonej w świecie Triwersum. Gra jest aplikacją desktopową z interfejsem graficznym, napisaną w języku Python z użyciem biblioteki `tkinter`.
+
+### Cechy Gry
+- **Eksploracja:** Poruszaj się po proceduralnie generowanych mapach.
+- **Walka:** Walcz z wrogami w taktycznym, turowym systemie opartym na umiejętnościach.
+- **System Postaci:** Rozwijaj swoją postać, zdobywając doświadczenie i poziomy.
+- **Interakcje:** Rozmawiaj z postaciami niezależnymi i wykonuj zadania.
+- **Ekwipunek:** Zarządzaj swoim ekwipunkiem i wyposażeniem.
+- **Zapis/Odczyt:** Zapisuj i wczytuj swoje postępy w dowolnym momencie.
+
+### Uruchamianie Gry
+Aby uruchomić grę bezpośrednio ze źródeł, potrzebujesz Pythona 3. Następnie uruchom główny plik gry:
+```bash
+python3 src/main.py
+```
+
+### Budowanie Gry
+Dostarczono skrypt do spakowania gry w jeden, samodzielny plik wykonywalny.
+
+1.  **Zainstaluj zależności:**
+    Upewnij się, że masz zainstalowany `PyInstaller`.
+    ```bash
+    pip install pyinstaller
+    ```
+2.  **Uruchom skrypt budujący:**
+    ```bash
+    ./build.sh
+    ```
+3.  **Znajdź grę:**
+    Ukończona gra znajdzie się w nowo utworzonym katalogu `dist/`.
