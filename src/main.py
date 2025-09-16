@@ -58,12 +58,14 @@ class Player:
     def __init__(self, x, y):
         self.x, self.y = x, y; self.gd_max, self.gd, self.sm_max, self.sm, self.wgk = 100, 100, 50, 50, 0
         self.level, self.xp, self.xp_to_next_level = 1, 0, 100
+        self.base_damage = 5; self.damage_bonus = 0
         self.inventory = [Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20})]
         self.equipment = {"Ręka": None, "Ciało": None}; self.quest_journal = {}
         self.skills = [Skill("Zwykły Atak", 0, 8, "Prosty atak fizyczny."), Skill("Harmoniczne Uderzenie", 10, 20, "Uderzenie nasycone Mocażem.")]
         self.icon = "@"; self.color = "lightblue"; self.name = "Gracz"
     def to_dict(self):
         return {"x": self.x, "y": self.y, "gd_max": self.gd_max, "gd": self.gd, "sm_max": self.sm_max, "sm": self.sm, "level": self.level, "xp": self.xp, "xp_to_next_level": self.xp_to_next_level, "inventory": [item.to_dict() for item in self.inventory], "equipment": {slot: item.to_dict() if item else None for slot, item in self.equipment.items()}, "quest_journal": {key: quest.to_dict() for key, quest in self.quest_journal.items()}}
+    def get_total_damage(self, skill_damage): return skill_damage + self.damage_bonus
     def _level_up_core(self):
         if self.xp >= self.xp_to_next_level:
             self.xp -= self.xp_to_next_level; self.level += 1
@@ -72,9 +74,7 @@ class Player:
     def add_xp(self, amount):
         self.xp += amount
         leveled_up = False
-        while self.xp >= self.xp_to_next_level:
-            self._level_up_core()
-            leveled_up = True
+        while self.xp >= self.xp_to_next_level: self._level_up_core(); leveled_up = True
         return leveled_up
     def add_quest(self, quest):
         if quest.key not in self.quest_journal: quest.status = "active"; self.quest_journal[quest.key] = quest
@@ -114,26 +114,35 @@ class GameLogic:
         floor_regions = self.map_generator.find_regions(tile_type=0)
         if not floor_regions: self.initialize_game_state(); return
         largest_region = max(floor_regions, key=len)
-        entity_count = 1 + len(self.static_npcs) + len(self.static_enemies)
+
+        # Filter static enemies based on quest state
+        enemies_to_spawn = {"Wróg Funkcji": self.static_enemies["Wróg Funkcji"], "Siewca Paradygmatu": self.static_enemies["Siewca Paradygmatu"]}
+        if self.player.quest_journal.get("bonglord_quest", {}).status == "rewarded":
+            enemies_to_spawn["Cień Szkarłatnego Pana"] = self.static_enemies["Cień Szkarłatnego Pana"]
+
+        entity_count = 1 + len(self.static_npcs) + len(enemies_to_spawn)
         if len(largest_region) < entity_count: self.initialize_game_state(); return
+
         spawn_points = random.sample(largest_region, entity_count)
         player_pos = spawn_points.pop(); self.player = Player(player_pos[0], player_pos[1])
         self.npcs = []; self.enemies = []
         for npc_template in self.static_npcs:
             pos = spawn_points.pop(); self.npcs.append(NPC(pos[0], pos[1], npc_template.name, npc_template.dialogue_key))
-        for name, (gd, skills, xp) in self.static_enemies.items():
+        for name, (gd, skills, xp) in enemies_to_spawn.items():
             pos = spawn_points.pop(); self.enemies.append(Enemy(pos[0], pos[1], name, gd, skills, xp))
+
     def initialize_game_state(self, from_save=None):
-        self.items = {"kleszcze": Equipment("Kleszcze Króla Dzwonów", "Zwiększa maks. SM o 15.", "Ręka", bonuses={"sm_max": 15}), "fartuch": Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20})}
-        self.available_skills = {"fala_mocazu": Skill("Fala Mocażu", 15, 5, "Obronne uderzenie, które rani i osłabia.")}
+        self.items = {"fartuch": Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20}), "kleszcze": Equipment("Kleszcze Króla Dzwonów", "Zwiększa maks. SM o 15.", "Ręka", bonuses={"sm_max": 15}), "synonim": Equipment("Synonim Grzechu", "Potężny artefakt. +15 do obrażeń, +5 do WGK.", "Ręka", bonuses={"damage_bonus": 15, "wgk": 5})}
+        self.available_skills = {"fala_mocazu": Skill("Fala Mocażu", 15, 5, "Obronne uderzenie.")}
         self.static_npcs = [NPC(0, 0, "Mędrzec Ji-Ae", "ji_ae_start"), NPC(0, 0, "Lord Bonglord", "bonglord_start")]
-        self.static_enemies = {"Wróg Funkcji": (50, [Skill("Cios Funkcyjny", 0, 8)], 40), "Siewca Paradygmatu": (80, [Skill("Cios Paradygmatu", 0, 12)], 75)}
-        self.quests = {"bonglord_quest": Quest("bonglord_quest", "Próba Harmonii", "Pomóż Lordowi Bonglordowi.", [Objective("Porozmawiaj z Mędrcem Ji-Ae", "talk_to", "Mędrzec Ji-Ae"), Objective("Pokonaj Siewcę Paradygmatu", "defeat", "Siewca Paradygmatu")], reward={"type": "item", "key": "kleszcze"})}
+        self.static_enemies = {"Wróg Funkcji": (50, [Skill("Cios Funkcyjny", 0, 8)], 40), "Siewca Paradygmatu": (80, [Skill("Cios Paradygmatu", 0, 12)], 75), "Cień Szkarłatnego Pana": (120, [Skill("Cieniste Ostrze", 0, 18)], 150)}
+        self.quests = {"bonglord_quest": Quest("bonglord_quest", "Próba Harmonii", "Pomóż Lordowi Bonglordowi.", [Objective("Porozmawiaj z Mędrcem Ji-Ae", "talk_to", "Mędrzec Ji-Ae"), Objective("Pokonaj Siewcę Paradygmatu", "defeat", "Siewca Paradygmatu")], reward={"type": "item", "key": "kleszcze"}), "shadow_quest": Quest("shadow_quest", "Zagrożenie z Cienia", "Pokonaj Cień Szkarłatnego Pana.", [Objective("Pokonaj Cień Szkarłatnego Pana", "defeat", "Cień Szkarłatnego Pana")], reward={"type": "item", "key": "synonim"})}
         if from_save: self.load_from_state(from_save)
         else:
             self.map_layout = self.map_generator.generate_map()
-            self._place_entities()
+            self._place_entities() # This will now place a default set of entities
         self.dialogues = self.get_dialogues()
+
     def get_levelup_rewards(self):
         rewards = [{"type": "gd", "text": "+20 Maks. GD", "tooltip": "Zwiększa maksymalną Gęstość Dopy i w pełni leczy."}, {"type": "sm", "text": "+10 Maks. SM", "tooltip": "Zwiększa maksymalny Strumień Mocażu i w pełni go odnawia."}]
         fala_mocazu_skill = self.available_skills["fala_mocazu"]
@@ -191,8 +200,9 @@ class GameLogic:
         log, events = [], []
         if self.player.sm < player_skill.cost: log.append("Brak Strumienia Mocażu!"); return log, events
         self.player.sm -= player_skill.cost
-        enemy.gd -= player_skill.damage
-        log.append(f"Używasz '{player_skill.name}' i zadajesz {player_skill.damage} obrażeń.")
+        total_player_damage = self.player.get_total_damage(player_skill.damage)
+        enemy.gd -= total_player_damage
+        log.append(f"Używasz '{player_skill.name}' i zadajesz {total_player_damage} obrażeń.")
         if enemy.gd <= 0:
             log.append(f"{enemy.name} został pokonany!")
             if self.player.add_xp(enemy.xp_reward): events.append("level_up")
@@ -212,7 +222,16 @@ class GameLogic:
                     if obj.target_type == event_type and obj.target_name == target_name: obj.is_done = True
                 if all(obj.is_done for obj in quest.objectives): quest.status = "completed"
     def get_dialogues(self):
-        return {"ji_ae_start": {"text": "Witaj, wędrowcze.", "options": [{"label": "Lord Bonglord mnie przysyła.", "next": "ji_ae_quest_talk", "condition": lambda: self.player.quest_journal.get("bonglord_quest", {}).status == "active"}, {"label": "[Odejdź]", "next": "end"}]}, "ji_ae_quest_talk": {"text": "Ach, więc to o to chodzi. Siewca Paradygmatu na północy... Jest potężny. Uważaj.", "options": [{"label": "[Dziękuję za ostrzeżenie]", "next": "end", "action": "update_quest", "target": "Mędrzec Ji-Ae"}]}, "bonglord_start": {"text": "Czuję harmonię w twoim oddechu. Ale coś zakłóca przepływy...", "options": [{"label": "Co masz na myśli?", "next": "bonglord_quest_offer", "condition": lambda: self.player.quest_journal.get("bonglord_quest") is None}, {"label": "Wróciłem, mistrzu.", "next": "bonglord_reward", "condition": lambda: self.player.quest_journal.get("bonglord_quest", {}).status == "completed"}, {"label": "[Odejdź]", "next": "end"}]}, "bonglord_quest_offer": {"text": "Siewca Paradygmatu mąci na północy. Porozmawiaj z Ji-Ae, a potem go pokonaj. Zostaniesz nagrodzony.", "options": [{"label": "Zgoda.", "next": "end", "action": "start_quest", "quest_key": "bonglord_quest"}, {"label": "Nie teraz.", "next": "end"}]}, "bonglord_reward": {"text": "Wykonałeś zadanie. Równowaga wraca. Przyjmij ten dar.", "options": [{"label": "[Weź nagrodę]", "next": "end", "action": "grant_reward", "quest_key": "bonglord_quest"}]}}
+        dialogues = {"ji_ae_start": {"text": "Witaj, wędrowcze.", "options": [{"label": "Lord Bonglord mnie przysyła.", "next": "ji_ae_quest_talk", "condition": lambda: self.player.quest_journal.get("bonglord_quest", {}).status == "active"}, {"label": "[Odejdź]", "next": "end"}]}, "ji_ae_quest_talk": {"text": "Ach, więc to o to chodzi. Siewca Paradygmatu na północy... Jest potężny. Uważaj.", "options": [{"label": "[Dziękuję za ostrzeżenie]", "next": "end", "action": "update_quest", "target": "Mędrzec Ji-Ae"}]}, "bonglord_reward": {"text": "Wykonałeś zadanie. Równowaga wraca. Przyjmij ten dar.", "options": [{"label": "[Weź nagrodę]", "next": "end", "action": "grant_reward", "quest_key": "bonglord_quest"}]}, "shadow_quest_offer": {"text": "Czuję nowe zakłócenie... mroczniejsze. Cień z przeszłości. Znajdź go i zniszcz.", "options": [{"label": "Uczynię to.", "next": "end", "action": "start_quest", "quest_key": "shadow_quest"}, {"label": "To zbyt niebezpieczne.", "next": "end"}]}, "shadow_quest_reward": {"text": "Cień zniknął. Twoja odwaga jest wielka. Ale strzeż się mocy, którą zdobyłeś.", "options": [{"label": "[Weź Synonim Grzechu]", "next": "end", "action": "grant_reward", "quest_key": "shadow_quest"}]}}
+        bonglord_start_node = {"text": "Czuję harmonię w twoim oddechu...", "options": []}
+        if self.player.quest_journal.get("shadow_quest", {}).status == 'completed': bonglord_start_node["options"].append({"label": "[Podziękuj za radę]", "next": "end"})
+        elif self.player.quest_journal.get("shadow_quest") is not None: pass # In progress
+        elif self.player.quest_journal.get("bonglord_quest", {}).status == 'rewarded': bonglord_start_node["options"].append({"label": "Pojawiło się nowe zagrożenie?", "next": "shadow_quest_offer"})
+        if self.player.quest_journal.get("bonglord_quest", {}).status == 'completed': bonglord_start_node["options"].append({"label": "Wróciłem, mistrzu.", "next": "bonglord_reward"})
+        if self.player.quest_journal.get("bonglord_quest") is None: bonglord_start_node["options"].append({"label": "Coś zakłóca przepływy?", "next": "bonglord_quest_offer"})
+        bonglord_start_node["options"].append({"label": "[Odejdź]", "next": "end"})
+        dialogues["bonglord_start"] = bonglord_start_node
+        return dialogues
 
 # --- GUI ---
 
@@ -367,8 +386,8 @@ class TriwersumGame:
             if "level_up" in events: self.open_levelup_window()
             refresh()
         refresh()
-    def open_levelup_window(self):
-        win = tk.Toplevel(self.root); win.title("Awans na Poziom!"); win.configure(bg="#2c2c2c"); win.grab_set()
+    def open_levelup_window(self, root_win):
+        win = tk.Toplevel(root_win); win.title("Awans na Poziom!"); win.configure(bg="#2c2c2c"); win.grab_set()
         win.protocol("WM_DELETE_WINDOW", lambda: None)
         tk.Label(win, text=f"Osiągnięto Poziom {self.game_logic.player.level}!", font=self.bold_font, bg="#2c2c2c", fg="yellow").pack(pady=10)
         tk.Label(win, text="Wybierz swoją nagrodę:", font=self.bold_font, bg="#2c2c2c", fg="white").pack(pady=5)
@@ -377,7 +396,7 @@ class TriwersumGame:
             self.game_logic.apply_levelup_reward(reward["type"], reward.get("value"))
             self.update_stats_display()
             if self.game_logic.player._level_up_core():
-                win.destroy(); self.open_levelup_window()
+                win.destroy(); self.open_levelup_window(root_win)
             else:
                 win.destroy()
         rewards = self.game_logic.get_levelup_rewards()
