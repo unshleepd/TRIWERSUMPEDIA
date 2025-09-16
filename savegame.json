@@ -1,0 +1,39 @@
+{
+    "player": {
+        "x": 5,
+        "y": 6,
+        "gd": 100,
+        "sm": 50,
+        "level": 1,
+        "xp": 50,
+        "inventory": [
+            {
+                "name": "Fartuch Wuja",
+                "type": "equipment",
+                "slot": "Cia\u0142o",
+                "bonuses": {
+                    "gd_max": 20
+                }
+            }
+        ],
+        "equipment": {
+            "R\u0119ka": null,
+            "Cia\u0142o": null
+        },
+        "quest_journal": {}
+    },
+    "enemies": [
+        {
+            "name": "Wr\u00f3g Funkcji",
+            "x": 10,
+            "y": 8,
+            "gd": 50
+        },
+        {
+            "name": "Siewca Paradygmatu",
+            "x": 12,
+            "y": 2,
+            "gd": 80
+        }
+    ]
+}
