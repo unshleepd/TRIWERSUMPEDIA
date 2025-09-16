@@ -64,12 +64,17 @@ class Player:
         self.icon = "@"; self.color = "lightblue"; self.name = "Gracz"
     def to_dict(self):
         return {"x": self.x, "y": self.y, "gd_max": self.gd_max, "gd": self.gd, "sm_max": self.sm_max, "sm": self.sm, "level": self.level, "xp": self.xp, "xp_to_next_level": self.xp_to_next_level, "inventory": [item.to_dict() for item in self.inventory], "equipment": {slot: item.to_dict() if item else None for slot, item in self.equipment.items()}, "quest_journal": {key: quest.to_dict() for key, quest in self.quest_journal.items()}}
-    def _level_up(self):
-        self.xp -= self.xp_to_next_level; self.level += 1; self.xp_to_next_level = int(self.xp_to_next_level*1.5); self.gd_max += 10; self.sm_max += 5; self.gd = self.gd_max; self.sm = self.sm_max
+    def _level_up_core(self):
+        if self.xp >= self.xp_to_next_level:
+            self.xp -= self.xp_to_next_level; self.level += 1
+            self.xp_to_next_level = int(self.xp_to_next_level * 1.5); return True
+        return False
     def add_xp(self, amount):
         self.xp += amount
         leveled_up = False
-        while self.xp >= self.xp_to_next_level: self._level_up(); leveled_up = True
+        while self.xp >= self.xp_to_next_level:
+            self._level_up_core()
+            leveled_up = True
         return leveled_up
     def add_quest(self, quest):
         if quest.key not in self.quest_journal: quest.status = "active"; self.quest_journal[quest.key] = quest
@@ -120,6 +125,7 @@ class GameLogic:
             pos = spawn_points.pop(); self.enemies.append(Enemy(pos[0], pos[1], name, gd, skills, xp))
     def initialize_game_state(self, from_save=None):
         self.items = {"kleszcze": Equipment("Kleszcze Króla Dzwonów", "Zwiększa maks. SM o 15.", "Ręka", bonuses={"sm_max": 15}), "fartuch": Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20})}
+        self.available_skills = {"fala_mocazu": Skill("Fala Mocażu", 15, 5, "Obronne uderzenie, które rani i osłabia.")}
         self.static_npcs = [NPC(0, 0, "Mędrzec Ji-Ae", "ji_ae_start"), NPC(0, 0, "Lord Bonglord", "bonglord_start")]
         self.static_enemies = {"Wróg Funkcji": (50, [Skill("Cios Funkcyjny", 0, 8)], 40), "Siewca Paradygmatu": (80, [Skill("Cios Paradygmatu", 0, 12)], 75)}
         self.quests = {"bonglord_quest": Quest("bonglord_quest", "Próba Harmonii", "Pomóż Lordowi Bonglordowi.", [Objective("Porozmawiaj z Mędrcem Ji-Ae", "talk_to", "Mędrzec Ji-Ae"), Objective("Pokonaj Siewcę Paradygmatu", "defeat", "Siewca Paradygmatu")], reward={"type": "item", "key": "kleszcze"})}
@@ -128,6 +134,17 @@ class GameLogic:
             self.map_layout = self.map_generator.generate_map()
             self._place_entities()
         self.dialogues = self.get_dialogues()
+    def get_levelup_rewards(self):
+        rewards = [{"type": "gd", "text": "+20 Maks. GD", "tooltip": "Zwiększa maksymalną Gęstość Dopy i w pełni leczy."}, {"type": "sm", "text": "+10 Maks. SM", "tooltip": "Zwiększa maksymalny Strumień Mocażu i w pełni go odnawia."}]
+        fala_mocazu_skill = self.available_skills["fala_mocazu"]
+        if fala_mocazu_skill not in self.player.skills:
+            rewards.append({"type": "skill", "value": fala_mocazu_skill, "text": f"Nowa Umiejętność: {fala_mocazu_skill.name}", "tooltip": fala_mocazu_skill.description})
+        return rewards
+    def apply_levelup_reward(self, reward_type, reward_value=None):
+        if reward_type == "gd": self.player.gd_max += 20; self.player.gd = self.player.gd_max
+        elif reward_type == "sm": self.player.sm_max += 10; self.player.sm = self.player.sm_max
+        elif reward_type == "skill" and reward_value:
+            if reward_value not in self.player.skills: self.player.skills.append(reward_value)
     def get_save_state(self): return {"player": self.player.to_dict(), "enemies": [e.to_dict() for e in self.enemies], "map_layout": self.map_layout}
     def load_from_state(self, state):
         self.map_layout = state["map_layout"]
@@ -347,9 +364,27 @@ class TriwersumGame:
         def on_skill(skill):
             entries, events = self.game_logic.handle_combat_turn(skill, enemy)
             for entry in entries: log.insert(tk.END, entry + "\n"); log.see(tk.END)
-            if "level_up" in events: messagebox.showinfo("Awans!", f"Osiągnięto poziom {self.game_logic.player.level}!")
+            if "level_up" in events: self.open_levelup_window()
             refresh()
         refresh()
+    def open_levelup_window(self):
+        win = tk.Toplevel(self.root); win.title("Awans na Poziom!"); win.configure(bg="#2c2c2c"); win.grab_set()
+        win.protocol("WM_DELETE_WINDOW", lambda: None)
+        tk.Label(win, text=f"Osiągnięto Poziom {self.game_logic.player.level}!", font=self.bold_font, bg="#2c2c2c", fg="yellow").pack(pady=10)
+        tk.Label(win, text="Wybierz swoją nagrodę:", font=self.bold_font, bg="#2c2c2c", fg="white").pack(pady=5)
+        rewards_frame = tk.Frame(win, bg="#2c2c2c"); rewards_frame.pack(pady=10, padx=20)
+        def on_choose(reward):
+            self.game_logic.apply_levelup_reward(reward["type"], reward.get("value"))
+            self.update_stats_display()
+            if self.game_logic.player._level_up_core():
+                win.destroy(); self.open_levelup_window()
+            else:
+                win.destroy()
+        rewards = self.game_logic.get_levelup_rewards()
+        for reward in rewards:
+            btn = tk.Button(rewards_frame, text=reward["text"], command=partial(on_choose, reward), bg="#444", fg="white", relief=tk.FLAT)
+            btn.pack(fill=tk.X, pady=5)
+            Tooltip(btn, reward["tooltip"])
 
 def main():
     try:
