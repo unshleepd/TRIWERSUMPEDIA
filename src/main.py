@@ -8,6 +8,25 @@ from map_generator import MapGenerator
 
 SAVE_FILE = "savegame.json"
 
+# --- Helper Classes ---
+class Tooltip:
+    def __init__(self, widget, text):
+        self.widget = widget; self.text = text; self.tooltip_window = None
+        self.widget.bind("<Enter>", self.show_tooltip)
+        self.widget.bind("<Leave>", self.hide_tooltip)
+    def show_tooltip(self, event=None):
+        if self.tooltip_window or not self.text: return
+        x, y, _, _ = self.widget.bbox("insert")
+        x += self.widget.winfo_rootx() + 25
+        y += self.widget.winfo_rooty() + 20
+        self.tooltip_window = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True); tw.wm_geometry(f"+{x}+{y}")
+        label = tk.Label(tw, text=self.text, justify=tk.LEFT, background="#FFFFE0", relief=tk.SOLID, borderwidth=1, wraplength=180)
+        label.pack(ipadx=1)
+    def hide_tooltip(self, event=None):
+        if self.tooltip_window: self.tooltip_window.destroy()
+        self.tooltip_window = None
+
 # --- Data Classes ---
 class Skill:
     def __init__(self, name, cost, damage, description=""): self.name, self.cost, self.damage, self.description = name, cost, damage, description
@@ -35,14 +54,14 @@ class Equipment(Item):
         data = super().to_dict()
         data.update({"slot": self.slot, "bonuses": self.bonuses})
         return data
-
 class Player:
     def __init__(self, x, y):
         self.x, self.y = x, y; self.gd_max, self.gd, self.sm_max, self.sm, self.wgk = 100, 100, 50, 50, 0
         self.level, self.xp, self.xp_to_next_level = 1, 0, 100
         self.inventory = [Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20})]
         self.equipment = {"Ręka": None, "Ciało": None}; self.quest_journal = {}
-        self.skills = [Skill("Zwykły Atak", 0, 8), Skill("Harmoniczne Uderzenie", 10, 20)]
+        self.skills = [Skill("Zwykły Atak", 0, 8, "Prosty atak fizyczny."), Skill("Harmoniczne Uderzenie", 10, 20, "Uderzenie nasycone Mocażem.")]
+        self.icon = "@"; self.color = "lightblue"; self.name = "Gracz"
     def to_dict(self):
         return {"x": self.x, "y": self.y, "gd_max": self.gd_max, "gd": self.gd, "sm_max": self.sm_max, "sm": self.sm, "level": self.level, "xp": self.xp, "xp_to_next_level": self.xp_to_next_level, "inventory": [item.to_dict() for item in self.inventory], "equipment": {slot: item.to_dict() if item else None for slot, item in self.equipment.items()}, "quest_journal": {key: quest.to_dict() for key, quest in self.quest_journal.items()}}
     def _level_up(self):
@@ -50,9 +69,7 @@ class Player:
     def add_xp(self, amount):
         self.xp += amount
         leveled_up = False
-        while self.xp >= self.xp_to_next_level:
-            self._level_up()
-            leveled_up = True
+        while self.xp >= self.xp_to_next_level: self._level_up(); leveled_up = True
         return leveled_up
     def add_quest(self, quest):
         if quest.key not in self.quest_journal: quest.status = "active"; self.quest_journal[quest.key] = quest
@@ -71,9 +88,13 @@ class Player:
             self.gd = min(self.gd, self.gd_max); return True
         return False
 class NPC:
-    def __init__(self, x, y, name, dialogue_key): self.x, self.y, self.name, self.dialogue_key = x, y, name, dialogue_key
+    def __init__(self, x, y, name, dialogue_key):
+        self.x, self.y, self.name, self.dialogue_key = x, y, name, dialogue_key
+        self.icon = "N"; self.color = "lightgreen"
 class Enemy:
-    def __init__(self, x, y, name, gd, skills, xp_reward): self.x, self.y, self.name, self.gd, self.skills, self.xp_reward = x, y, name, gd, skills, xp_reward
+    def __init__(self, x, y, name, gd, skills, xp_reward):
+        self.x, self.y, self.name, self.gd, self.skills, self.xp_reward = x, y, name, gd, skills, xp_reward
+        self.icon = "E"; self.color = "#E06666"
     def to_dict(self): return {"name": self.name, "x": self.x, "y": self.y, "gd": self.gd}
 
 # --- Game Logic ---
@@ -84,14 +105,12 @@ class GameLogic:
         self.map_layout = []
         self.map_generator = MapGenerator(grid_width, grid_height)
         self.initialize_game_state()
-
     def _place_entities(self):
         floor_regions = self.map_generator.find_regions(tile_type=0)
         if not floor_regions: self.initialize_game_state(); return
         largest_region = max(floor_regions, key=len)
         entity_count = 1 + len(self.static_npcs) + len(self.static_enemies)
-        if len(largest_region) < entity_count:
-            print("Warning: Not enough space in the largest region to place all entities."); self.initialize_game_state(); return
+        if len(largest_region) < entity_count: self.initialize_game_state(); return
         spawn_points = random.sample(largest_region, entity_count)
         player_pos = spawn_points.pop(); self.player = Player(player_pos[0], player_pos[1])
         self.npcs = []; self.enemies = []
@@ -99,7 +118,6 @@ class GameLogic:
             pos = spawn_points.pop(); self.npcs.append(NPC(pos[0], pos[1], npc_template.name, npc_template.dialogue_key))
         for name, (gd, skills, xp) in self.static_enemies.items():
             pos = spawn_points.pop(); self.enemies.append(Enemy(pos[0], pos[1], name, gd, skills, xp))
-
     def initialize_game_state(self, from_save=None):
         self.items = {"kleszcze": Equipment("Kleszcze Króla Dzwonów", "Zwiększa maks. SM o 15.", "Ręka", bonuses={"sm_max": 15}), "fartuch": Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20})}
         self.static_npcs = [NPC(0, 0, "Mędrzec Ji-Ae", "ji_ae_start"), NPC(0, 0, "Lord Bonglord", "bonglord_start")]
@@ -110,7 +128,6 @@ class GameLogic:
             self.map_layout = self.map_generator.generate_map()
             self._place_entities()
         self.dialogues = self.get_dialogues()
-
     def get_save_state(self): return {"player": self.player.to_dict(), "enemies": [e.to_dict() for e in self.enemies], "map_layout": self.map_layout}
     def load_from_state(self, state):
         self.map_layout = state["map_layout"]
@@ -186,9 +203,10 @@ class TriwersumGame:
     def __init__(self, root):
         self.root = root; self.root.title("Triwersum Roguelike"); self.root.configure(bg="#1a1a1a")
         self.bold_font = tkfont.Font(family="Helvetica", size=10, weight="bold")
+        self.map_font = tkfont.Font(family="Courier", size=20, weight="bold")
         self.grid_width, self.grid_height, self.cell_size = 15, 12, 40
         self.game_logic = GameLogic(self.grid_width, self.grid_height)
-        self.player_rect, self.entity_rects = None, {}
+        self.player_text_id, self.entity_text_ids = None, {}
         main_frame = tk.Frame(root, bg="#1a1a1a"); main_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
         self.canvas = tk.Canvas(main_frame, width=self.grid_width*self.cell_size, height=self.grid_height*self.cell_size, bg="#222", highlightthickness=0)
         self.canvas.pack(side=tk.LEFT, padx=(0, 10)); self.canvas.bind("<Button-1>", self.handle_map_click)
@@ -223,20 +241,21 @@ class TriwersumGame:
         for x in range(self.grid_width):
             for y in range(self.grid_height):
                 tile_type = self.game_logic.map_layout[x][y]
-                color = "#333" if tile_type == 1 else "#555"
-                self.canvas.create_rectangle(x*self.cell_size, y*self.cell_size, (x+1)*self.cell_size, (y+1)*self.cell_size, fill=color, outline=color, tags="map_tile")
+                color = "#282828" if tile_type == 1 else "#555"
+                self.canvas.create_rectangle(x*self.cell_size, y*self.cell_size, (x+1)*self.cell_size, (y+1)*self.cell_size, fill=color, outline="")
     def draw_player(self):
-        if self.player_rect: self.canvas.delete(self.player_rect)
-        x1, y1 = self.game_logic.player.x*self.cell_size, self.game_logic.player.y*self.cell_size
-        self.player_rect = self.canvas.create_rectangle(x1, y1, x1+self.cell_size, y1+self.cell_size, fill="blue", outline="lightblue", width=2)
+        if self.player_text_id: self.canvas.delete(self.player_text_id)
+        p = self.game_logic.player
+        x, y = (p.x + 0.5) * self.cell_size, (p.y + 0.5) * self.cell_size
+        self.player_text_id = self.canvas.create_text(x, y, text=p.icon, fill=p.color, font=self.map_font)
     def draw_entities(self):
-        for name in self.entity_rects: self.canvas.delete(self.entity_rects[name])
-        self.entity_rects.clear()
+        for name in self.entity_text_ids: self.canvas.delete(self.entity_text_ids[name])
+        self.entity_text_ids.clear()
         for entity in self.game_logic.npcs + self.game_logic.enemies:
             color = "green" if isinstance(entity, NPC) else "red"
-            x1, y1 = entity.x*self.cell_size, entity.y*self.cell_size
-            rect = self.canvas.create_rectangle(x1, y1, x1+self.cell_size, y1+self.cell_size, fill=color, outline=f"light{color}", width=2)
-            self.entity_rects[entity.name] = rect
+            x, y = (entity.x + 0.5) * self.cell_size, (entity.y + 0.5) * self.cell_size
+            text_id = self.canvas.create_text(x, y, text=entity.icon, fill=entity.color, font=self.map_font)
+            self.entity_text_ids[entity.name] = text_id
     def refresh_all_ui(self):
         self.draw_map(); self.draw_entities(); self.draw_player(); self.update_stats_display()
     def handle_map_click(self, event):
@@ -255,13 +274,14 @@ class TriwersumGame:
             for w in win.winfo_children(): w.destroy()
             tk.Label(win, text="-- WYPOSAŻONE --", font=self.bold_font, bg="#2c2c2c", fg="white").pack(pady=5)
             for slot, item in self.game_logic.player.equipment.items():
-                f = tk.Frame(win, bg="#2c2c2c"); f.pack(padx=10, fill=tk.X)
-                tk.Label(f, text=f"{slot}: {item.name if item else 'Pusty'}", bg="#2c2c2c", fg="white").pack(side=tk.LEFT)
-                if item: tk.Button(f, text="Zdejmij", command=partial(self.on_unequip, item, refresh), bg="#555", fg="white", relief=tk.FLAT).pack(side=tk.RIGHT)
-            tk.Label(win, text="-- PLECAK --", font=self.bold_font, bg="#2c2c2c", fg="white").pack(pady=5)
+                f = tk.Frame(win, bg="#2c2c2c"); f.pack(padx=10, fill=tk.X, pady=2)
+                item_label = tk.Label(f, text=f"{slot}: {item.name if item else 'Pusty'}", bg="#2c2c2c", fg="white"); item_label.pack(side=tk.LEFT)
+                if item: Tooltip(item_label, item.description); tk.Button(f, text="Zdejmij", command=partial(self.on_unequip, item, refresh), bg="#555", fg="white", relief=tk.FLAT).pack(side=tk.RIGHT)
+            tk.Label(win, text="-- PLECAK --", font=self.bold_font, bg="#2c2c2c", fg="white").pack(pady=10)
             for item in self.game_logic.player.inventory:
-                f = tk.Frame(win, bg="#2c2c2c"); f.pack(padx=10, fill=tk.X)
-                tk.Label(f, text=item.name, bg="#2c2c2c", fg="white").pack(side=tk.LEFT)
+                f = tk.Frame(win, bg="#2c2c2c"); f.pack(padx=10, fill=tk.X, pady=2)
+                item_label = tk.Label(f, text=item.name, bg="#2c2c2c", fg="white"); item_label.pack(side=tk.LEFT)
+                Tooltip(item_label, item.description)
                 if item.item_type == "equipment": tk.Button(f, text="Wyposaż", command=partial(self.on_equip, item, refresh), bg="#444", fg="white", relief=tk.FLAT).pack(side=tk.RIGHT)
         refresh()
     def on_equip(self, item, cb):
@@ -298,15 +318,21 @@ class TriwersumGame:
         display(npc.dialogue_key)
     def open_combat_window(self, enemy):
         win = tk.Toplevel(self.root); win.title(f"Walka: {enemy.name}"); win.configure(bg="#2c2c2c"); win.grab_set()
-        info = tk.Frame(win, bg="#2c2c2c"); info.pack(pady=10, padx=10, fill=tk.X)
-        player_hp = tk.Label(info, font=self.bold_font, bg="#2c2c2c", fg="white"); player_hp.pack()
-        enemy_hp = tk.Label(info, font=self.bold_font, bg="#2c2c2c", fg="white"); enemy_hp.pack()
-        log = tk.Text(win, height=8, width=60, bg="#1a1a1a", fg="white", relief=tk.FLAT, font=("Courier", 9)); log.pack(pady=10, padx=10)
-        skills_frame = tk.Frame(win, bg="#2c2c2c"); skills_frame.pack(pady=10)
+        stats_frame = tk.Frame(win, bg="#2c2c2c"); stats_frame.pack(pady=10, padx=10, fill=tk.X, expand=True)
+        log_frame = tk.Frame(win, bg="#2c2c2c"); log_frame.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
+        skills_frame = tk.Frame(win, bg="#2c2c2c"); skills_frame.pack(pady=10, padx=10)
+        player_frame = tk.Frame(stats_frame, bg="#3c3c3c", bd=2, relief=tk.RIDGE); player_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        enemy_frame = tk.Frame(stats_frame, bg="#3c3c3c", bd=2, relief=tk.RIDGE); enemy_frame.pack(side=tk.RIGHT, fill=tk.X, expand=True, padx=5)
+        tk.Label(player_frame, text="Gracz", font=self.bold_font, bg="#3c3c3c", fg="white").pack()
+        player_hp_label = tk.Label(player_frame, font=self.bold_font, bg="#3c3c3c", fg="white"); player_hp_label.pack()
+        tk.Label(enemy_frame, text=enemy.name, font=self.bold_font, bg="#3c3c3c", fg="white").pack()
+        enemy_hp_label = tk.Label(enemy_frame, font=self.bold_font, bg="#3c3c3c", fg="white"); enemy_hp_label.pack()
+        log_text = tk.Text(log_frame, height=10, width=60, bg="#1a1a1a", fg="white", relief=tk.FLAT, font=("Courier", 9)); log_text.pack()
+        log_text.insert(tk.END, f"Napotykasz {enemy.name}!\n")
         def refresh():
             p = self.game_logic.player
-            player_hp.config(text=f"Twoje GD: {p.gd}/{p.gd_max}")
-            enemy_hp.config(text=f"GD Wroga: {enemy.gd if enemy.gd > 0 else 0}")
+            player_hp_label.config(text=f"GD: {p.gd}/{p.gd_max}")
+            enemy_hp_label.config(text=f"GD: {enemy.gd if enemy.gd > 0 else 0}")
             self.update_stats_display()
             for w in skills_frame.winfo_children(): w.destroy()
             if p.gd <= 0 or enemy not in self.game_logic.enemies:
@@ -314,9 +340,10 @@ class TriwersumGame:
                 self.draw_entities()
             else:
                 for skill in p.skills:
-                    btn = tk.Button(skills_frame, text=f"{skill.name} ({skill.cost} SM)", command=partial(on_skill, skill), bg="#900", fg="white", relief=tk.FLAT)
+                    btn = tk.Button(skills_frame, text=f"{skill.name}\n({skill.cost} SM)", command=partial(on_skill, skill), bg="#900", fg="white", relief=tk.FLAT)
                     if p.sm < skill.cost: btn.config(state=tk.DISABLED, bg="#555")
-                    btn.pack(side=tk.LEFT, padx=5)
+                    btn.pack(side=tk.LEFT, padx=5, ipadx=5, ipady=2)
+                    Tooltip(btn, f"{skill.description}\nObrażenia: {skill.damage}")
         def on_skill(skill):
             entries, events = self.game_logic.handle_combat_turn(skill, enemy)
             for entry in entries: log.insert(tk.END, entry + "\n"); log.see(tk.END)
