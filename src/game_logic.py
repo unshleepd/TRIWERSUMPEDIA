@@ -1,17 +1,85 @@
 import os
 import json
 import random
-from map_generator import MapGenerator
-from data_classes import Player, NPC, Enemy, Skill, Quest, Objective, Equipment, Item
+import tcod
+from map_generator import MapGenerator, Tile, Door, Rect
+from data_classes import Player, NPC, Enemy, Skill, Quest, Objective, Equipment, Item, Chest
 
 SAVE_FILE = "savegame.json"
 
+class Map:
+    def __init__(self, width, height, tiles, doors, entities):
+        self.width = width
+        self.height = height
+        self.tiles = tiles
+        self.doors = doors
+        self.entities = entities
+        self.fov_map = self.initialize_fov()
+
+    def initialize_fov(self):
+        fov = tcod.map.Map(width=self.width, height=self.height, order="F")
+        for y in range(self.height):
+            for x in range(self.width):
+                is_transparent = not self.tiles[x][y].block_sight
+                is_walkable = not self.tiles[x][y].blocked
+
+                door = self.get_door_at(x, y)
+                if door and not door.is_open:
+                    is_transparent = False
+                    is_walkable = False
+
+                fov.transparent[x, y] = is_transparent
+                fov.walkable[x, y] = is_walkable
+        return fov
+
+    def compute_fov(self, x, y, radius):
+        self.fov_map.compute_fov(x, y, radius, True, tcod.FOV_DIAMOND)
+
+    def is_in_fov(self, x, y):
+        if 0 <= x < self.width and 0 <= y < self.height:
+            return self.fov_map.fov[x, y]
+        return False
+
+    def get_entity_at(self, x, y):
+        for entity in self.entities:
+            if entity.x == x and entity.y == y:
+                return entity
+        return None
+
+    def get_door_at(self, x, y):
+        for door in self.doors:
+            if door.x == x and door.y == y:
+                return door
+        return None
+
+    def to_dict(self):
+        return {
+            "width": self.width,
+            "height": self.height,
+            "tiles": [[tile.to_dict() for tile in col] for col in self.tiles],
+            "doors": [door.to_dict() for door in self.doors],
+            "entities": [entity.to_dict() for entity in self.entities if not isinstance(entity, Player)]
+        }
+
+    @classmethod
+    def from_dict(cls, data, player, game_logic_helpers):
+        width, height = data["width"], data["height"]
+        tiles = [[Tile.from_dict(tile_data) for tile_data in col] for col in data["tiles"]]
+        doors = [Door.from_dict(door_data) for door_data in data["doors"]]
+
+        entities = [player]
+        for e_data in data.get("entities", []):
+            entities.append(game_logic_helpers.rebuild_entity(e_data))
+
+        return cls(width, height, tiles, doors, entities)
+
 class GameLogic:
-    def __init__(self, grid_width, grid_height):
-        self.grid_width, self.grid_height = grid_width, grid_height
-        self.map_layout = []
+    def __init__(self, grid_width=50, grid_height=35):
+        self.grid_width = grid_width
+        self.grid_height = grid_height
         self.map_generator = MapGenerator(grid_width, grid_height)
         self.player = None
+        self.map = None
         self.initialize_game_state()
 
     def _define_content(self):
@@ -20,185 +88,171 @@ class GameLogic:
             "harmonic_strike": Skill("harmonic_strike", "Harmoniczne Uderzenie", 10, 20, "Uderzenie nasycone Mocażem.", prerequisites=["basic_attack"]),
             "decay_pattern": Skill("decay_pattern", "Wzór Rozpadu", 25, 40, "Potężny, ale kosztowny atak.", prerequisites=["harmonic_strike"]),
             "fala_mocazu": Skill("fala_mocazu", "Fala Mocażu", 15, 5, "Obronne uderzenie, które leczy część obrażeń.", prerequisites=["basic_attack"]),
-            "aegis_of_kopec": Skill("aegis_of_kopec", "Egida Kopcia", 20, 0, "Tworzy barierę ochronną.", prerequisites=["fala_mocazu"]),
-            "cieniste_ostrze": Skill("cieniste_ostrze", "Cieniste Ostrze", 0, 18, "Potężny atak cienia."),
-            "cios_paradygmatu": Skill("cios_paradygmatu", "Cios Paradygmatu", 0, 12, "Atak zmieniający rzeczywistość."),
-            "cios_funkcyjny": Skill("cios_funkcyjny", "Cios Funkcyjny", 0, 8, "Atak zakłócający harmonię.")
         }
-        self.items = {"fartuch": Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20}), "kleszcze": Equipment("Kleszcze Króla Dzwonów", "Zwiększa maks. SM o 15.", "Ręka", bonuses={"sm_max": 15}), "synonim": Equipment("Synonim Grzechu", "Potężny artefakt. +15 do obrażeń, +5 do WGK.", "Ręka", bonuses={"damage_bonus": 15, "wgk": 5})}
-        self.static_npcs = [NPC(0, 0, "Mędrzec Ji-Ae", "ji_ae_start"), NPC(0, 0, "Lord Bonglord", "bonglord_start")]
-        self.static_enemies = {
-            "Wróg Funkcji": (50, [self.master_skills["cios_funkcyjny"]], 40),
-            "Siewca Paradygmatu": (80, [self.master_skills["cios_paradygmatu"]], 100),
-            "Cień Szkarłatnego Pana": (120, [self.master_skills["cieniste_ostrze"]], 150),
-            "Heretyk Krwawego Słońca": (60, [self.master_skills["decay_pattern"]], 120)
+        self.items = {
+            "fartuch": Equipment("Fartuch Wuja", "Zwiększa maks. GD o 20.", "Ciało", bonuses={"gd_max": 20}),
+            "kleszcze": Equipment("Kleszcze Króla Dzwonów", "Zwiększa maks. SM o 15.", "Ręka", bonuses={"sm_max": 15}),
         }
-        self.quests = {"bonglord_quest": Quest("bonglord_quest", "Próba Harmonii", "Pomóż Lordowi Bonglordowi.", [Objective("Porozmawiaj z Mędrcem Ji-Ae", "talk_to", "Mędrzec Ji-Ae"), Objective("Pokonaj Siewcę Paradygmatu", "defeat", "Siewca Paradygmatu")], reward={"type": "item", "key": "kleszcze"}), "shadow_quest": Quest("shadow_quest", "Zagrożenie z Cienia", "Pokonaj Cień Szkarłatnego Pana.", [Objective("Pokonaj Cień Szkarłatnego Pana", "defeat", "Cień Szkarłatnego Pana")], reward={"type": "item", "key": "synonim"})}
+        self.static_npcs = [NPC(0, 0, "Mędrzec Ji-Ae", "ji_ae_start")]
+        self.static_enemies_info = {
+            "Wróg Funkcji": {"gd": 50, "skills": [self.master_skills["basic_attack"]], "xp": 40},
+            "Siewca Paradygmatu": {"gd": 80, "skills": [self.master_skills["harmonic_strike"]], "xp": 100},
+        }
+        self.quests = {
+            "main_quest": Quest("main_quest", "Echo Rozpadu", "Odnajdź źródło chaosu.", [Objective("Znajdź Mędrca Ji-Ae", "talk_to", "Mędrzec Ji-Ae")])
+        }
+        self.dialogues = {
+            "ji_ae_start": {
+                "text": "Witaj, wędrowcze. Czuję w tobie echo Mocażu. Czego szukasz w tych zapomnianych korytarzach?",
+                "options": [{"label": "Kim jesteś?", "next": "ji_ae_who"}, {"label": "Szukam odpowiedzi.", "next": "ji_ae_answers"}]
+            },
+            "ji_ae_who": {"text": "Jestem tylko echem przeszłości, strażnikiem wiedzy, która umiera. Nazywają mnie Ji-Ae.", "options": [{"label": "Wróć", "next": "ji_ae_start"}]},
+            "ji_ae_answers": {"text": "Odpowiedzi... one często prowadzą do kolejnych pytań. Jeśli chcesz je poznać, musisz być gotów na prawdę. Zacznij główny quest.", "options": [{"label": "Zgadzam się.", "next": "end", "action": "start_quest", "quest_key": "main_quest"}]}
+        }
 
     def _place_entities(self):
-        floor_regions = self.map_generator.find_regions(tile_type=0)
-        if not floor_regions: self.initialize_game_state(); return
-        largest_region = max(floor_regions, key=len)
+        tiles, doors, rooms = self.map_generator.generate_bsp_map()
+        entities = []
 
-        enemies_to_spawn = dict(self.static_enemies)
-        if self.player:
-            bonglord_quest = self.player.quest_journal.get("bonglord_quest")
-            if not (bonglord_quest and bonglord_quest.status == "rewarded"):
-                if "Cień Szkarłatnego Pana" in enemies_to_spawn: del enemies_to_spawn["Cień Szkarłatnego Pana"]
-        elif "Cień Szkarłatnego Pana" in enemies_to_spawn:
-            del enemies_to_spawn["Cień Szkarłatnego Pana"]
+        player_x, player_y = rooms[0].center()
+        self.player = Player(player_x, player_y)
+        self.player.unlocked_skills.add("basic_attack")
+        entities.append(self.player)
 
-        entity_count = 1 + len(self.static_npcs) + len(enemies_to_spawn)
-        if len(largest_region) < entity_count: self.initialize_game_state(); return
+        spawn_points = []
+        for room in rooms[1:]:
+            spawn_points.append(room.center())
+        random.shuffle(spawn_points)
 
-        spawn_points = random.sample(largest_region, entity_count)
-        player_pos = spawn_points.pop()
-        if not self.player: self.player = Player(player_pos[0], player_pos[1])
-        else: self.player.x, self.player.y = player_pos
-
-        self.npcs = []
         for npc_template in self.static_npcs:
-            pos = spawn_points.pop(); self.npcs.append(NPC(pos[0], pos[1], npc_template.name, npc_template.dialogue_key))
+            if spawn_points:
+                x, y = spawn_points.pop()
+                entities.append(NPC(x, y, npc_template.name, npc_template.dialogue_key))
 
-        self.enemies = []
-        for name, (gd, skills, xp) in enemies_to_spawn.items():
-            pos = spawn_points.pop(); self.enemies.append(Enemy(pos[0], pos[1], name, gd, skills, xp))
+        for name, info in self.static_enemies_info.items():
+            if spawn_points:
+                x, y = spawn_points.pop()
+                entities.append(Enemy(x, y, name, info["gd"], info["skills"], info["xp"]))
+
+        for i in range(3):
+            if spawn_points:
+                x, y = spawn_points.pop()
+                entities.append(Chest(x, y, id=f"chest_{i}"))
+
+        self.map = Map(self.grid_width, self.grid_height, tiles, doors, entities)
 
     def initialize_game_state(self, from_save=None):
         self._define_content()
-        if from_save: self.load_from_state(from_save)
+        if from_save:
+            self.load_from_state(from_save)
         else:
-            self.player = None
-            self.map_layout = self.map_generator.generate_map()
             self._place_entities()
-        self.dialogues = self.get_dialogues()
-
-    def get_levelup_rewards(self):
-        return [
-            {"type": "gd", "text": "+20 Maks. GD", "tooltip": "Zwiększa maksymalną Gęstość Dopy i w pełni leczy."},
-            {"type": "sm", "text": "+10 Maks. SM", "tooltip": "Zwiększa maksymalny Strumień Mocażu i w pełni go odnawia."},
-            {"type": "skill_point", "text": "+1 Pkt. Umiejętności", "tooltip": "Otrzymaj punkt do wydania w Drzewku Umiejętności."}
-        ]
-
-    def apply_levelup_reward(self, reward_type):
-        if reward_type == "gd": self.player.gd_max += 20; self.player.gd = self.player.gd_max
-        elif reward_type == "sm": self.player.sm_max += 10; self.player.sm = self.player.sm_max
-        elif reward_type == "skill_point": self.player.skill_points += 1
 
     def get_save_state(self):
-        return {"player": self.player.to_dict(), "enemies": [e.to_dict() for e in self.enemies], "map_layout": self.map_layout}
+        return {"player": self.player.to_dict(), "map": self.map.to_dict()}
 
     def load_from_state(self, state):
-        self.map_layout = state["map_layout"]
-        p_data = state["player"]
-        self.player = Player(p_data["x"], p_data["y"])
-        for key in ["gd_max", "gd", "sm_max", "sm", "level", "xp", "xp_to_next_level", "skill_points"]:
-            if key in p_data: setattr(self.player, key, p_data[key])
-        self.player.unlocked_skills = set(p_data.get("unlocked_skills", {"basic_attack"}))
-        self.player.inventory = [self.rebuild_item(item_data) for item_data in p_data.get("inventory", [])]
-        self.player.equipment = {slot: self.rebuild_item(item_data) for slot, item_data in p_data.get("equipment", {}).items()}
-        for item in self.player.equipment.values():
-            if item and item.item_type == "equipment":
-                for stat, value in item.bonuses.items(): setattr(self.player, stat, getattr(self.player, stat) + value)
+        self.player = Player.from_dict(state["player"], self)
+        self.map = Map.from_dict(state["map"], self.player, self)
 
-        self.player.quest_journal = {}
-        for key, q_data in p_data.get("quest_journal", {}).items():
-            template = self.quests[key]
-            # Correctly reconstruct the quest without using __dict__
-            self.player.quest_journal[key] = Quest.from_dict(
-                q_data,
-                key=template.key,
-                title=template.title,
-                description=template.description,
-                objectives=template.objectives,
-                reward=template.reward
-            )
+    def handle_player_action(self, target_x, target_y):
+        if not self.map.is_in_fov(target_x, target_y): return ("invalid_move", "Cannot see target.")
 
-        self.enemies = []
-        for e_data in state["enemies"]:
-            name, gd, skills, xp = e_data["name"], e_data["gd"], self.static_enemies[e_data["name"]][1], self.static_enemies[e_data["name"]][2]
-            self.enemies.append(Enemy(e_data["x"], e_data["y"], name, gd, skills, xp))
+        door = self.map.get_door_at(target_x, target_y)
+        if door and abs(target_x - self.player.x) <= 1 and abs(target_y - self.player.y) <= 1:
+             door.is_open = not door.is_open
+             self.map.initialize_fov()
+             return ("interact_door", door)
 
-    def rebuild_item(self, item_data):
-        if not item_data: return None
-        for item in self.items.values():
-            if item.name == item_data["name"]: return Equipment(item.name, item.description, item.slot, item.bonuses)
-        return Item(item_data.get("name", "Unknown"), "Unknown")
-
-    def save_game(self):
-        with open(SAVE_FILE, 'w') as f: json.dump(self.get_save_state(), f, indent=4)
-
-    def load_game(self):
-        if not os.path.exists(SAVE_FILE): return False
-        with open(SAVE_FILE, 'r') as f: state = json.load(f)
-        self.initialize_game_state(from_save=state)
-        return True
-
-    def get_entity_at(self, x, y):
-        for entity in self.npcs + self.enemies:
-            if entity.x == x and entity.y == y: return entity
-        return None
-
-    def move_player_or_interact(self, target_x, target_y):
-        if not (0 <= target_x < self.grid_width and 0 <= target_y < self.grid_height): return ("invalid", None)
-        if self.map_layout[target_x][target_y] == 1: return ("invalid", None)
-        entity = self.get_entity_at(target_x, target_y)
+        entity = self.map.get_entity_at(target_x, target_y)
         if entity:
-            if isinstance(entity, NPC): return ("interact", entity)
-            if isinstance(entity, Enemy): return ("combat", entity)
-        if abs(target_x - self.player.x) + abs(target_y - self.player.y) == 1:
-            self.player.x, self.player.y = target_x, target_y
-            return ("move", None)
-        return ("invalid", None)
+            if isinstance(entity, NPC): return ("interact_npc", entity)
+            if isinstance(entity, Enemy): return ("attack_enemy", entity)
+            if isinstance(entity, Chest):
+                if not entity.looted:
+                    found_item = self.open_chest(entity)
+                    return ("interact_chest", found_item)
+                return ("info", "This chest is empty.")
+
+        if self.map.fov_map.walkable[target_x, target_y] and abs(target_x - self.player.x) <= 1 and abs(target_y - self.player.y) <= 1:
+             self.player.x, self.player.y = target_x, target_y
+             return ("move", None)
+
+        return ("invalid_move", None)
+
+    def open_chest(self, chest):
+        chest.looted = True
+        found_item_key = random.choice(list(self.items.keys()))
+        found_item = self.items[found_item_key]
+        self.player.add_item(found_item)
+        return found_item
 
     def handle_combat_turn(self, player_skill, enemy):
-        log, events = [], []
-        if self.player.sm < player_skill.cost: log.append("Brak Strumienia Mocażu!"); return log, events
-        total_player_damage = self.player.get_total_damage(player_skill.damage)
-        enemy.gd -= total_player_damage
-        log.append(f"Używasz '{player_skill.name}' i zadajesz {total_player_damage} obrażeń.")
+        log, events = [], set()
+        p_dmg = player_skill.damage + self.player.get_stat_bonus("damage")
+        enemy.gd -= p_dmg
+        log.append(f"Zadałeś {p_dmg} obrażeń {enemy.name}.")
         if enemy.gd <= 0:
             log.append(f"{enemy.name} został pokonany!")
-            if self.player.add_xp(enemy.xp_reward): events.append("level_up")
+            self.player.gain_xp(enemy.xp_value)
+            if self.player._level_up_core(): events.add("level_up")
             self.update_quest_progress("defeat", enemy.name)
-            self.enemies.remove(enemy)
+            self.map.entities.remove(enemy)
             return log, events
-        enemy_skill = enemy.skills[0]
-        self.player.gd -= enemy_skill.damage
-        log.append(f"{enemy.name} używa '{enemy_skill.name}' i rani cię za {enemy_skill.damage} obrażeń.")
-        if self.player.gd <= 0: log.append("Zostałeś pokonany...")
+        e_dmg = enemy.skills[0].damage
+        self.player.gd -= e_dmg
+        log.append(f"{enemy.name} zadał ci {e_dmg} obrażeń.")
+        if self.player.gd <= 0: log.append("Zostałeś pokonany!")
         return log, events
 
     def start_quest(self, key):
-        if key in self.quests: self.player.add_quest(self.quests[key])
+        if key in self.quests and key not in self.player.quest_journal:
+            self.player.quest_journal[key] = self.quests[key]
+            self.player.quest_journal[key].status = "active"
 
     def update_quest_progress(self, event_type, target_name):
-        for quest in self.player.quest_journal.values():
-            if quest.status == "active":
-                for obj in quest.objectives:
-                    if obj.target_type == event_type and obj.target_name == target_name: obj.is_done = True
-                if all(obj.is_done for obj in quest.objectives): quest.status = "completed"
+        for q in self.player.quest_journal.values():
+            if q.status == "active": q.update_progress(event_type, target_name)
 
-    def get_dialogues(self):
-        dialogues = {"ji_ae_start": {"text": "Witaj, wędrowcze.", "options": []}, "ji_ae_quest_talk": {"text": "Ach, więc to o to chodzi. Siewca Paradygmatu na północy... Jest potężny. Uważaj.", "options": [{"label": "[Dziękuję za ostrzeżenie]", "next": "end", "action": "update_quest", "target": "Mędrzec Ji-Ae"}]}, "bonglord_reward": {"text": "Wykonałeś zadanie. Równowaga wraca. Przyjmij ten dar.", "options": [{"label": "[Weź nagrodę]", "next": "end", "action": "grant_reward", "quest_key": "bonglord_quest"}]}, "shadow_quest_offer": {"text": "Czuję nowe zakłócenie... mroczniejsze. Cień z przeszłości. Znajdź go i zniszcz.", "options": [{"label": "Uczynię to.", "next": "end", "action": "start_quest", "quest_key": "shadow_quest"}, {"label": "To zbyt niebezpieczne.", "next": "end"}]}, "shadow_quest_reward": {"text": "Cień zniknął. Twoja odwaga jest wielka. Ale strzeż się mocy, którą zdobyłeś.", "options": [{"label": "[Weź Synonim Grzechu]", "next": "end", "action": "grant_reward", "quest_key": "shadow_quest"}]}}
-        if self.player:
-            ji_ae_quest = self.player.quest_journal.get("bonglord_quest")
-            if ji_ae_quest and ji_ae_quest.status == "active":
-                dialogues["ji_ae_start"]["options"].append({"label": "Lord Bonglord mnie przysyła.", "next": "ji_ae_quest_talk"})
-        dialogues["ji_ae_start"]["options"].append({"label": "[Odejdź]", "next": "end"})
-        bonglord_start_node = {"text": "Czuję harmonię w twoim oddechu...", "options": []}
-        if self.player:
-            shadow_quest = self.player.quest_journal.get("shadow_quest")
-            bonglord_quest = self.player.quest_journal.get("bonglord_quest")
-            if shadow_quest and shadow_quest.status == 'completed':
-                 bonglord_start_node["options"].append({"label": "[Podziękuj za radę]", "next": "end"})
-            elif shadow_quest: pass
-            elif bonglord_quest and bonglord_quest.status == 'rewarded':
-                bonglord_start_node["options"].append({"label": "Pojawiło się nowe zagrożenie?", "next": "shadow_quest_offer"})
-            if bonglord_quest and bonglord_quest.status == 'completed':
-                bonglord_start_node["options"].append({"label": "Wróciłem, mistrzu.", "next": "bonglord_reward"})
-            if not bonglord_quest:
-                bonglord_start_node["options"].append({"label": "Coś zakłóca przepływy?", "next": "bonglord_quest_offer"})
-        bonglord_start_node["options"].append({"label": "[Odejdź]", "next": "end"})
-        dialogues["bonglord_start"] = bonglord_start_node
-        return dialogues
+    def get_levelup_rewards(self):
+        return [
+            {"text": "+10 Maks. GD", "type": "gd_max", "tooltip": "Zwiększa maksymalną Gęstość Dopy."},
+            {"text": "+5 Maks. SM", "type": "sm_max", "tooltip": "Zwiększa maksymalną Siłę Mocażu."},
+            {"text": "+1 Punkt Umiejętności", "type": "skill_point", "tooltip": "Otrzymujesz punkt do wydania w drzewku umiejętności."}
+        ]
+
+    def apply_levelup_reward(self, reward_type):
+        if reward_type == "skill_point": self.player.skill_points += 1
+        else: setattr(self.player, reward_type, getattr(self.player, reward_type) + (10 if reward_type == "gd_max" else 5))
+        self.player.reset_stats()
+
+    def rebuild_item(self, item_data):
+        if not item_data: return None
+        return self.items.get(item_data["name"].lower().replace(" ", "_")) # Simple key from name
+
+    def rebuild_entity(self, entity_data):
+        class_name = entity_data["class"]
+        if class_name == "NPC": return NPC.from_dict(entity_data)
+        if class_name == "Chest": return Chest.from_dict(entity_data)
+        if class_name == "Enemy":
+            template = self.static_enemies_info[entity_data["name"]]
+            return Enemy.from_dict(entity_data, template["skills"])
+        return None
+
+    def save_game(self, filepath=SAVE_FILE):
+        with open(filepath, 'w') as f:
+            json.dump(self.get_save_state(), f, indent=4)
+
+    def load_game(self, filepath=SAVE_FILE):
+        if not os.path.exists(filepath): return False
+        with open(filepath, 'r') as f:
+            state = json.load(f, object_hook=self.json_object_hook)
+        self.initialize_game_state(from_save=state)
+        return True
+
+    def json_object_hook(self, d):
+        if "class" in d:
+            # This is where you would deserialize specific classes if needed,
+            # but we handle it in from_dict methods.
+            return d
+        return d

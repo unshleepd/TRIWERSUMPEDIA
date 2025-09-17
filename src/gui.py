@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import font as tkfont, messagebox
 from functools import partial
 from game_logic import GameLogic
-from data_classes import NPC, Enemy
+from data_classes import NPC, Enemy, Chest
 
 class Tooltip:
     def __init__(self, widget, text):
@@ -29,26 +29,40 @@ class Tooltip:
             self.tooltip_window.destroy()
         self.tooltip_window = None
 
-class TriwersumGame:
-    def __init__(self, root):
+class GameGUI:
+    def __init__(self, root, game_logic: GameLogic):
         self.root = root
+        self.game_logic = game_logic
         self.root.title("Triwersum Roguelike")
         self.root.configure(bg="#1a1a1a")
+
         self.bold_font = tkfont.Font(family="Helvetica", size=10, weight="bold")
         self.map_font = tkfont.Font(family="Courier", size=20, weight="bold")
-        self.grid_width, self.grid_height, self.cell_size = 15, 12, 40
-        self.game_logic = GameLogic(self.grid_width, self.grid_height)
-        self.player_text_id, self.entity_text_ids = None, {}
+
+        self.cell_size = 40
+        self.player_text_id = None
+        self.entity_text_ids = {}
+
         main_frame = tk.Frame(root, bg="#1a1a1a")
         main_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        self.canvas = tk.Canvas(main_frame, width=self.grid_width * self.cell_size, height=self.grid_height * self.cell_size, bg="#222", highlightthickness=0)
+
+        self.canvas = tk.Canvas(main_frame, bg="#222", highlightthickness=0)
         self.canvas.pack(side=tk.LEFT, padx=(0, 10))
         self.canvas.bind("<Button-1>", self.handle_map_click)
+
         sidebar = tk.Frame(main_frame, bg="#1a1a1a")
         sidebar.pack(side=tk.RIGHT, fill=tk.Y, expand=True)
+
         self.stats_labels = self.create_stats_display(sidebar)
         self.create_action_buttons(sidebar)
+
+        self.setup_canvas()
         self.refresh_all_ui()
+
+    def setup_canvas(self):
+        self.grid_width = self.game_logic.map.width
+        self.grid_height = self.game_logic.map.height
+        self.canvas.config(width=self.grid_width * self.cell_size, height=self.grid_height * self.cell_size)
 
     def create_stats_display(self, parent):
         frame = tk.Frame(parent, bg="#2c2c2c")
@@ -83,44 +97,73 @@ class TriwersumGame:
         self.stats_labels["WGK"].config(text=str(p.wgk))
 
     def draw_map(self):
-        self.canvas.delete("map_tile")
-        for x in range(self.grid_width):
-            for y in range(self.grid_height):
-                tile_type = self.game_logic.map_layout[x][y]
-                color = "#282828" if tile_type == 1 else "#555"
+        self.canvas.delete("all")
+        for y in range(self.grid_height):
+            for x in range(self.grid_width):
+                if not self.game_logic.map.is_in_fov(x, y):
+                    color = "#000"
+                else:
+                    tile = self.game_logic.map.tiles[x][y]
+                    color = "#282828" if tile.blocked else "#555"
                 self.canvas.create_rectangle(x * self.cell_size, y * self.cell_size, (x + 1) * self.cell_size, (y + 1) * self.cell_size, fill=color, outline="")
 
+        for door in self.game_logic.map.doors:
+            if self.game_logic.map.is_in_fov(door.x, door.y):
+                x, y = door.x, door.y
+                text = "+" if door.is_open else "D"
+                self.canvas.create_text((x + 0.5) * self.cell_size, (y + 0.5) * self.cell_size, text=text, fill="yellow", font=self.map_font)
+
     def draw_player(self):
-        if self.player_text_id:
-            self.canvas.delete(self.player_text_id)
+        if self.player_text_id: self.canvas.delete(self.player_text_id)
         p = self.game_logic.player
         x, y = (p.x + 0.5) * self.cell_size, (p.y + 0.5) * self.cell_size
         self.player_text_id = self.canvas.create_text(x, y, text=p.icon, fill=p.color, font=self.map_font)
 
     def draw_entities(self):
-        for name in self.entity_text_ids:
-            self.canvas.delete(self.entity_text_ids[name])
+        for entity_id in self.entity_text_ids: self.canvas.delete(self.entity_text_ids[entity_id])
         self.entity_text_ids.clear()
-        for entity in self.game_logic.npcs + self.game_logic.enemies:
-            color = "green" if isinstance(entity, NPC) else "#E06666"
+
+        for entity in self.game_logic.map.entities:
+            if entity is self.game_logic.player: continue
+            if not self.game_logic.map.is_in_fov(entity.x, entity.y): continue
+
+            entity_id = getattr(entity, 'name', id(entity))
+            color = entity.color
+            if isinstance(entity, Chest) and entity.looted: color = "#777"
+
             x, y = (entity.x + 0.5) * self.cell_size, (entity.y + 0.5) * self.cell_size
             text_id = self.canvas.create_text(x, y, text=entity.icon, fill=color, font=self.map_font)
-            self.entity_text_ids[entity.name] = text_id
+            self.entity_text_ids[entity_id] = text_id
 
     def refresh_all_ui(self):
+        self.game_logic.map.compute_fov(self.game_logic.player.x, self.game_logic.player.y, 8)
         self.draw_map()
         self.draw_entities()
         self.draw_player()
         self.update_stats_display()
 
     def handle_map_click(self, event):
-        action, data = self.game_logic.move_player_or_interact(event.x // self.cell_size, event.y // self.cell_size)
+        clicked_x = event.x // self.cell_size
+        clicked_y = event.y // self.cell_size
+
+        action, data = self.game_logic.handle_player_action(clicked_x, clicked_y)
+
         if action == "move":
-            self.draw_player()
-        elif action == "interact":
+            self.refresh_all_ui()
+        elif action == "interact_door":
+            self.refresh_all_ui()
+        elif action == "interact_chest":
+            found_item = data
+            if found_item:
+                messagebox.showinfo("Znaleziono przedmiot!", f"W skrzyni znalazłeś: {found_item.name}")
+            else:
+                messagebox.showinfo("Pusta skrzynia", "Ta skrzynia jest już pusta.")
+            self.refresh_all_ui()
+        elif action == "interact_npc":
             self.open_dialogue_window(data)
-        elif action == "combat":
+        elif action == "attack_enemy":
             self.open_combat_window(data)
+
         self.update_stats_display()
 
     def on_save_game(self):
@@ -129,6 +172,7 @@ class TriwersumGame:
 
     def on_load_game(self):
         if self.game_logic.load_game():
+            self.setup_canvas()
             self.refresh_all_ui()
             messagebox.showinfo("Wczytano", "Gra została pomyślnie wczytana.")
         else:
@@ -199,28 +243,34 @@ class TriwersumGame:
         enemy_hp_label = tk.Label(enemy_frame, font=self.bold_font, bg="#3c3c3c", fg="white"); enemy_hp_label.pack()
         log_text = tk.Text(log_frame, height=10, width=60, bg="#1a1a1a", fg="white", relief=tk.FLAT, font=("Courier", 9)); log_text.pack()
         log_text.insert(tk.END, f"Napotykasz {enemy.name}!\n")
-        def refresh():
+
+        def refresh_combat_ui():
             p = self.game_logic.player
             player_hp_label.config(text=f"GD: {p.gd}/{p.gd_max}")
             enemy_hp_label.config(text=f"GD: {enemy.gd if enemy.gd > 0 else 0}")
             self.update_stats_display()
             for w in skills_frame.winfo_children(): w.destroy()
-            if p.gd <= 0 or enemy not in self.game_logic.enemies:
+
+            if p.gd <= 0 or enemy not in self.game_logic.map.entities:
                 tk.Button(skills_frame, text="Zakończ", command=win.destroy, bg="#444", fg="white", relief=tk.FLAT).pack()
-                self.draw_entities()
+                if enemy.gd <= 0:
+                    log_text.insert(tk.END, f"{enemy.name} pokonany!\n")
+                self.refresh_all_ui()
             else:
                 player_skills = [self.game_logic.master_skills[key] for key in sorted(list(self.game_logic.player.unlocked_skills))]
                 for skill in player_skills:
-                    btn = tk.Button(skills_frame, text=f"{skill.name}\n({skill.cost} SM)", command=partial(on_skill, skill), bg="#900", fg="white", relief=tk.FLAT)
+                    btn = tk.Button(skills_frame, text=f"{skill.name}\n({skill.cost} SM)", command=partial(on_skill_use, skill), bg="#900", fg="white", relief=tk.FLAT)
                     if p.sm < skill.cost: btn.config(state=tk.DISABLED, bg="#555")
                     btn.pack(side=tk.LEFT, padx=5, ipadx=5, ipady=2)
                     Tooltip(btn, f"{skill.description}\nObrażenia: {skill.damage}")
-        def on_skill(skill):
+
+        def on_skill_use(skill):
             entries, events = self.game_logic.handle_combat_turn(skill, enemy)
-            for entry in entries: log.insert(tk.END, entry + "\n"); log.see(tk.END)
+            for entry in entries: log_text.insert(tk.END, entry + "\n"); log_text.see(tk.END)
             if "level_up" in events: self.open_levelup_window(win)
-            refresh()
-        refresh()
+            refresh_combat_ui()
+
+        refresh_combat_ui()
 
     def open_levelup_window(self, root_win):
         win = tk.Toplevel(root_win); win.title("Awans na Poziom!"); win.configure(bg="#2c2c2c"); win.grab_set()
@@ -294,7 +344,7 @@ class TriwersumGame:
         for key, tier in tiers.items():
             if tier not in tier_groups: tier_groups[tier] = []
             tier_groups[tier].append(key)
-        y_step, x_padding = 80, 50
+        y_step = 80
         for tier, skill_keys in sorted(tier_groups.items()):
             num_skills_in_tier = len(skill_keys)
             tier_width = num_skills_in_tier * 160
