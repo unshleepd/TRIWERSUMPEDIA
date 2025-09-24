@@ -30,7 +30,7 @@
 ### **SEKCJA 2: UNIKALNA PROPOZYCJA WARTOŚCI (UVP)**
 
 **Wizualizacja:**
-*   **Układ:** Trzy minimalistyczne, podświetlane ikony, każda reprezentująca jeden z filarów projektu. Ikony mogą nawiązywać do symboli z mitologii Triwersum (np. schemat przepływu Dopy, symbol Kopca).
+*   **Układ:** Trzy minimalistyczne, podświetlane ikony, każda reprezentująca jeden z filarów projektu. Ikony mogą nawiązywać do symboli z mitologii Triwersum (np. schemat przepływu Dopy, symbol Kopcia).
 *   **Styl:** Czysty, korporacyjny design, który buduje zaufanie i podkreśla profesjonalizm.
 
 ---
@@ -59,7 +59,7 @@ Jesteśmy na progu stworzenia czegoś więcej niż projektu – budujemy dziedzi
 ### **SEKCJA 3: OPOWIEŚĆ O TRIWERSUM (NARRACJA I LORE)**
 
 **Wizualizacja:**
-*   **Tło:** Dynamiczna paralaksa z grafikami przedstawiającymi kluczowe pojęcia z lore: unoszący się w przestrzeni **Kopiec**, złowieszczy **Buch** wydobywający się z pęknięć w rzeczywistości oraz subtelne, energetyczne linie symbolizujące **Dopę**.
+*   **Tło:** Dynamiczna paralaksa z grafikami przedstawiającymi kluczowe pojęcia z lore: unoszący się w przestrzeni **Kopeć**, złowieszczy **Buch** wydobywający się z pęknięć w rzeczywistości oraz subtelne, energetyczne linie symbolizujące **Dopę**.
 *   **Styl:** Mistyczny, mroczny i filmowy. Każdy akapit może być ilustrowany symboliczną grafiką.
 
 ---
